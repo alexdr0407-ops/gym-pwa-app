@@ -1,0 +1,15 @@
+{
+  "name": "Gym AI Assistant",
+  "short_name": "GymAI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/ios-filled/512/ffffff/dumbbell.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
