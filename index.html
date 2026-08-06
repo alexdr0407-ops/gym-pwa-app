@@ -419,7 +419,7 @@
                 <p id="today-meal">Cargando menú del día...</p>
             </div>
 
-            <!-- Mini Calendario Semanal (Clicable para abrir anual por meses) -->
+            <!-- Mini Calendario Semanal -->
             <div class="card" style="cursor: pointer;" onclick="openCalendarModal()">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h2>📊 Constancia Semanal</h2>
@@ -486,13 +486,14 @@
     </div>
 
     <script>
+        // Fechas de ejemplo predeterminadas para que las gráficas salgan con fecha real
         let exercisesData = JSON.parse(localStorage.getItem("gym_exercises")) || [
-            { id: 1, name: "Press de Banca Inclinado", details: "4 series x 8-10 reps", weight: 75, history: [65, 70, 72.5, 75] },
-            { id: 2, name: "Jalón al Pecho", details: "4 series x 10-12 reps", weight: 60, history: [50, 55, 57.5, 60] }
+            { id: 1, name: "Press de Banca Inclinado", details: "4 series x 8-10 reps", weight: 75, dates: ["10 May", "20 May", "01 Jun", "15 Jun"], history: [65, 70, 72.5, 75] },
+            { id: 2, name: "Jalón al Pecho", details: "4 series x 10-12 reps", weight: 60, dates: ["12 May", "22 May", "03 Jun", "18 Jun"], history: [50, 55, 57.5, 60] }
         ];
 
         let bodyWeightData = JSON.parse(localStorage.getItem("gym_body_weight")) || {
-            labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+            dates: ['01 Jun', '08 Jun', '15 Jun', '22 Jun'],
             data: [74.0, 74.5, 74.2, 75.0]
         };
 
@@ -568,7 +569,10 @@
             document.getElementById("today-meal").innerText = "Comida: Arroz con pechuga de pollo y aguacate.\nCena: Salmón al horno con verduras salteadas.";
         }
 
-        // Clave única basada en asistencia al gym por fecha
+        function getFormattedShortDate(d = new Date()) {
+            return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+        }
+
         function getGymKey(d = new Date()) {
             return `gym_attendance_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
         }
@@ -604,7 +608,6 @@
             loadWeekCalendar();
         }
 
-        // Mini Calendario Semanal (L-D)
         function loadWeekCalendar() {
             const container = document.getElementById("week-container");
             container.innerHTML = "";
@@ -640,7 +643,6 @@
             }
         }
 
-        // Modal Calendario Anual Separado por Meses
         function openCalendarModal() {
             const modal = document.getElementById("calendar-modal");
             modal.style.display = "flex";
@@ -667,7 +669,6 @@
                 const grid = document.createElement("div");
                 grid.className = "month-grid";
 
-                // Cabecera días de la semana
                 daysOfWeekHeader.forEach(dName => {
                     const dHeader = document.createElement("div");
                     dHeader.className = "month-day-name";
@@ -675,17 +676,14 @@
                     grid.appendChild(dHeader);
                 });
 
-                // Días del mes
                 const firstDayIndex = (new Date(year, m, 1).getDay() + 6) % 7;
                 const totalDays = new Date(year, m + 1, 0).getDate();
 
-                // Espacios vacíos iniciales
                 for (let i = 0; i < firstDayIndex; i++) {
                     const emptyCell = document.createElement("div");
                     grid.appendChild(emptyCell);
                 }
 
-                // Días reales
                 for (let day = 1; day <= totalDays; day++) {
                     const dayCell = document.createElement("div");
                     dayCell.className = "month-day";
@@ -710,7 +708,6 @@
             document.getElementById("calendar-modal").style.display = "none";
         }
 
-        // Gestión de Ejercicios
         function renderExercisesUI() {
             const listContainer = document.getElementById("exercises-list-container");
             const selectContainer = document.getElementById("exercise-select");
@@ -750,11 +747,14 @@
                 return;
             }
 
+            const todayFormatted = getFormattedShortDate();
+
             exercisesData.push({
                 id: Date.now(),
                 name: name,
                 details: details || "3 series x 10 reps",
                 weight: weight,
+                dates: [todayFormatted],
                 history: [weight]
             });
 
@@ -777,7 +777,7 @@
             }
         }
 
-        // Gráficas con Chart.js
+        // Gráficas con fechas reales en el eje X
         function initCharts() {
             initExerciseChart();
             initBodyWeightChart();
@@ -790,12 +790,17 @@
             const currentEx = exercisesData[selectedIndex] || exercisesData[0];
             if (!currentEx) return;
 
+            // Asegurar compatibilidad si algún ejercicio antiguo no tuviera el campo dates
+            if (!currentEx.dates || currentEx.dates.length !== currentEx.history.length) {
+                currentEx.dates = currentEx.history.map((_, i) => `Día ${i + 1}`);
+            }
+
             if (exChart) exChart.destroy();
 
             exChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: currentEx.history.map((_, i) => `Medida ${i + 1}`),
+                    labels: currentEx.dates,
                     datasets: [{
                         label: `${currentEx.name} (kg)`,
                         data: currentEx.history,
@@ -830,7 +835,7 @@
             bwChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: bodyWeightData.labels,
+                    labels: bodyWeightData.dates,
                     datasets: [{
                         label: 'Peso Corporal (kg)',
                         data: bodyWeightData.data,
@@ -860,7 +865,9 @@
                 return;
             }
 
-            bodyWeightData.labels.push(`Reg ${bodyWeightData.labels.length + 1}`);
+            const todayFormatted = getFormattedShortDate();
+
+            bodyWeightData.dates.push(todayFormatted);
             bodyWeightData.data.push(val);
 
             localStorage.setItem("gym_body_weight", JSON.stringify(bodyWeightData));
