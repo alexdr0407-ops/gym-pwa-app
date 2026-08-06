@@ -321,7 +321,7 @@
                 <p id="today-meal">Cargando menú del día...</p>
             </div>
 
-            <!-- Calendario de Constancia -->
+            <!-- Calendario de Constancia (¡AQUÍ ESTABA EL FALLO!) -->
             <div class="card">
                 <h2>📊 Calendario del Mes</h2>
                 <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;" id="month-title">Tus días cumplidos</p>
@@ -408,7 +408,6 @@
         function showApp() {
             document.getElementById("login-screen").style.display = "none";
             document.getElementById("app-screen").style.display = "block";
-            // Renderizar gráfica si se abre
         }
 
         function switchView(viewName) {
@@ -428,7 +427,6 @@
                 btnExercises.classList.add("active");
                 btnHome.classList.remove("active");
                 
-                // Inicializar gráfica al cambiar de pestaña para evitar errores de renderizado
                 setTimeout(initChart, 100);
             }
         }
@@ -527,7 +525,7 @@
             const ctx = document.getElementById('weightChart').getContext('2d');
             
             if (myChart) {
-                myChart.destroy(); // Evitar duplicados al recargar vista
+                myChart.destroy();
             }
 
             myChart = new Chart(ctx, {
