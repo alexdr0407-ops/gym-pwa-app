@@ -358,7 +358,7 @@
     <div id="login-screen">
         <div class="login-card">
             <h1>GymAI 🏋️‍♂️</h1>
-            <input type="text" id="username" placeholder="Usuario (alex)" autocapitalize="none">
+            <input type="text" id="username" placeholder="Usuario (subnormal)" autocapitalize="none">
             <input type="password" id="password" placeholder="Contraseña">
             <button onclick="handleLogin()">Entrar</button>
             <div id="error-msg" class="error-msg">Usuario o contraseña incorrectos</div>
@@ -409,20 +409,20 @@
 
             <!-- Dashboard: Rutina de hoy -->
             <div class="card">
-                <h2>📅 Rutina de Hoy</h2>
+                <h2>Rutina de Hoy</h2>
                 <p id="today-routine">Cargando planificación del día...</p>
             </div>
 
             <!-- Dashboard: Comida asignada -->
             <div class="card">
-                <h2>🍽️ Plan Nutricional</h2>
+                <h2> Plan Nutricional</h2>
                 <p id="today-meal">Cargando menú del día...</p>
             </div>
 
             <!-- Mini Calendario Semanal -->
             <div class="card" style="cursor: pointer;" onclick="openCalendarModal()">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2>📊 Constancia Semanal</h2>
+                    <h2> Constancia Semanal</h2>
                     <span style="font-size: 12px; color: var(--accent-color);">Ver Meses Anuales 🔍</span>
                 </div>
                 <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Semana actual (Lunes a Domingo)</p>
@@ -431,7 +431,7 @@
 
             <!-- Módulo de Entrada -->
             <div class="card">
-                <h2>🎙️ Registrar Entreno o Comida</h2>
+                <h2> Registrar Entreno o Comida</h2>
                 <div class="input-section">
                     <textarea id="ai-input" placeholder="Ej: He hecho 4 series de press banca con 80kg..." style="width:100%; height:80px; padding:12px; background:#2c2c2e; border:1px solid #38383a; border-radius:10px; color:#fff; resize:none; margin-bottom:10px;"></textarea>
                     <button onclick="sendDataToN8n()">Enviar a n8n (Próximamente)</button>
@@ -444,7 +444,7 @@
             
             <!-- Lista de Ejercicios -->
             <div class="card">
-                <h2>🏋️‍♂️ Mis Ejercicios</h2>
+                <h2> Mis Ejercicios</h2>
                 <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Listado general de ejercicios y marcas actuales:</p>
                 
                 <div id="exercises-list-container"></div>
@@ -461,7 +461,7 @@
 
             <!-- Gráfica de evolución de Ejercicios -->
             <div class="card">
-                <h2>📈 Evolución de Pesos por Ejercicio</h2>
+                <h2> Evolución de Pesos por Ejercicio</h2>
                 <select id="exercise-select" onchange="updateExerciseChart()"></select>
                 <div class="chart-container">
                     <canvas id="exerciseChart"></canvas>
@@ -470,7 +470,7 @@
 
             <!-- Gráfica de evolución de Peso Corporal -->
             <div class="card">
-                <h2>⚖️ Evolución de mi Peso Corporal</h2>
+                <h2> Evolución de mi Peso Corporal</h2>
                 <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">Control de tu peso (kg)</p>
                 <div class="chart-container">
                     <canvas id="bodyWeightChart"></canvas>
@@ -581,7 +581,7 @@
 
             checkbox.checked = isCompleted;
             if (isCompleted) {
-                statusText.innerText = "¡Entrenado! 🚀";
+                statusText.innerText = "¡Entrenado! ";
                 statusText.style.color = "var(--success-color)";
             } else {
                 statusText.innerText = "Falta / Descanso";
@@ -595,7 +595,7 @@
             
             if (checkbox.checked) {
                 localStorage.setItem(getGymKey(), "true");
-                statusText.innerText = "¡Entrenado! 🚀";
+                statusText.innerText = "¡Entrenado! ";
                 statusText.style.color = "var(--success-color)";
             } else {
                 localStorage.removeItem(getGymKey());
@@ -730,7 +730,7 @@
                     </div>
                     <div class="exercise-actions">
                         <div class="weight-badge">${ex.weight} kg</div>
-                        <button class="delete-btn" onclick="deleteExercise(${index})">🗑️</button>
+                        <button class="delete-btn" onclick="deleteExercise(${index})"></button>
                     </div>
                 `;
                 listContainer.appendChild(item);
