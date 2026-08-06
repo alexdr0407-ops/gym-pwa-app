@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gym AI Assistant</title>
+    <!-- Configuración para que parezca una app nativa en iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: #1c1c1e;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --accent-color: #0a84ff;
+            --border-color: #38383a;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            padding-top: 50px;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+        .card h3 {
+            margin-top: 0;
+            font-size: 17px;
+            font-weight: 600;
+        }
+        textarea, input {
+            width: 100%;
+            background: #2c2c2e;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            padding: 12px;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            outline: none;
+        }
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+        }
+        button:active {
+            opacity: 0.7;
+        }
+        #response-box {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #30d158;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Mi Entrenador AI</h1>
+    <div class="subtitle">Control inteligente para tu iPhone</div>
+
+    <!-- Bloque 1: Registro por texto para n8n -->
+    <div class="card">
+        <h3>💬 Registrar entrenamiento</h3>
+        <p style="color: var(--text-secondary); font-size: 13px; margin-top: 0;">Ej: "Hoy hice press banca 4x10 con 80kg"</p>
+        <textarea id="workout-input" rows="3" placeholder="Escribe tu progreso aquí..."></textarea>
+        <button onclick="sendToN8n()">Enviar a n8n</button>
+        <div id="response-box"></div>
+    </div>
+
+    <!-- Bloque 2: Estado del sistema -->
+    <div class="card">
+        <h3>⚡ Estado de la PWA</h3>
+        <p style="color: var(--text-secondary); font-size: 13px;">Versión: 1.0.0 (Modo Online)</p>
+    </div>
+
+    <script>
+        function sendToN8n() {
+            const text = document.getElementById('workout-input').value;
+            const responseBox = document.getElementById('response-box');
+            
+            if(!text) {
+                alert('Por favor, escribe algo.');
+                return;
+            }
+
+            responseBox.innerText = "Enviando datos al servidor...";
+
+            // Aquí conectaremos luego el Webhook de tu n8n
+            setTimeout(() => {
+                responseBox.innerText = "¡Simulación correcta! (Próximamente conectado a tu n8n)";
+            }, 1000);
+        }
+
+        // Registro del Service Worker para funcionamiento PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log("Service Worker registrado con éxito."))
+                .catch(err => console.log("Error al registrar SW: ", err));
+        }
+    </script>
+</body>
+</html>
