@@ -11,6 +11,9 @@
     <meta name="apple-mobile-web-app-title" content="GymAI">
     <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/512/ffffff/dumbbell.png">
 
+    <!-- Librería Chart.js para las gráficas de evolución -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
             --bg-color: #000000;
@@ -94,8 +97,8 @@
             display: none;
         }
 
-        /* App Principal (Oculta hasta hacer login) */
-        #app-screen {
+        /* Vistas de la App */
+        .view-section {
             display: none;
         }
 
@@ -132,6 +135,24 @@
             line-height: 1.4;
         }
 
+        /* Botones de navegación */
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .nav-buttons button {
+            background-color: #2c2c2e;
+            color: var(--text-color);
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        .nav-buttons button.active {
+            background-color: var(--accent-color);
+        }
+
         /* Check Creatina */
         .creatine-box {
             display: flex;
@@ -155,7 +176,82 @@
             margin-bottom: 0;
         }
 
-        /* Caja de entrada de voz/texto */
+        /* Calendario Visual */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .calendar-day-name {
+            font-size: 11px;
+            color: var(--text-secondary);
+            padding-bottom: 4px;
+        }
+
+        .calendar-day {
+            background-color: #2c2c2e;
+            border-radius: 8px;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .calendar-day.completed {
+            background-color: rgba(48, 209, 88, 0.2);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .calendar-day.today {
+            border: 2px solid var(--accent-color);
+        }
+
+        /* Estilos para lista de ejercicios */
+        .exercise-item {
+            background-color: #2c2c2e;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exercise-info h3 {
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .exercise-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .weight-badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Gráfica */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            margin-top: 15px;
+        }
+
+        /* Caja de entrada */
         .input-section textarea {
             width: 100%;
             height: 90px;
@@ -176,7 +272,7 @@
     <div id="login-screen">
         <div class="login-card">
             <h1>GymAI 🏋️‍♂️</h1>
-            <input type="text" id="username" placeholder="Usuario (subnormal)" autocapitalize="none">
+            <input type="text" id="username" placeholder="Usuario (alex)" autocapitalize="none">
             <input type="password" id="password" placeholder="Contraseña">
             <button onclick="handleLogin()">Entrar</button>
             <div id="error-msg" class="error-msg">Usuario o contraseña incorrectos</div>
@@ -184,7 +280,7 @@
     </div>
 
     <!-- APLICACIÓN PRINCIPAL -->
-    <div id="app-screen">
+    <div id="app-screen" style="display: none;">
         <div class="header">
             <div>
                 <div class="date-title" id="current-date">CARGANDO FECHA...</div>
@@ -193,47 +289,99 @@
             <button onclick="handleLogout()" style="width: auto; padding: 6px 12px; font-size: 12px; background-color: #3a3a3c;">Salir</button>
         </div>
 
-        <!-- Dashboard: Creatina -->
-        <div class="card creatine-box">
-            <div>
-                <h2>Creatina</h2>
-                <p style="font-size: 13px; color: var(--text-secondary);">Regístrala hoy</p>
+        <!-- Botones de navegación superior -->
+        <div class="nav-buttons">
+            <button id="btn-home" class="active" onclick="switchView('home')">🏠 Hoy</button>
+            <button id="btn-exercises" onclick="switchView('exercises')">📈 Ejercicios y Pesos</button>
+        </div>
+
+        <!-- VISTA 1: INICIO (HOME) -->
+        <div id="view-home" class="view-section" style="display: block;">
+            <!-- Dashboard: Creatina -->
+            <div class="card creatine-box">
+                <div>
+                    <h2>Creatina</h2>
+                    <p style="font-size: 13px; color: var(--text-secondary);">Regístrala hoy</p>
+                </div>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="creatine-check" onclick="toggleCreatine()">
+                    <span id="creatine-status-text" style="color: var(--text-secondary);">Pendiente</span>
+                </label>
             </div>
-            <label class="checkbox-container">
-                <input type="checkbox" id="creatine-check" onclick="toggleCreatine()">
-                <span id="creatine-status-text" style="color: var(--text-secondary);">Pendiente</span>
-            </label>
+
+            <!-- Dashboard: Rutina de hoy -->
+            <div class="card">
+                <h2>📅 Rutina de Hoy</h2>
+                <p id="today-routine">Cargando planificación del día...</p>
+            </div>
+
+            <!-- Dashboard: Comida asignada -->
+            <div class="card">
+                <h2>🍽️ Plan Nutricional</h2>
+                <p id="today-meal">Cargando menú del día...</p>
+            </div>
+
+            <!-- Calendario de Constancia -->
+            <div class="card">
+                <h2>📊 Calendario del Mes</h2>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;" id="month-title">Tus días cumplidos</p>
+                <div class="calendar-grid" id="calendar-container"></div>
+            </div>
+
+            <!-- Módulo de Entrada -->
+            <div class="card">
+                <h2>🎙️ Registrar Entreno o Comida</h2>
+                <div class="input-section">
+                    <textarea id="ai-input" placeholder="Ej: He hecho 4 series de press banca con 80kg, o sube foto de tu plato..."></textarea>
+                    <button onclick="sendDataToN8n()">Enviar a n8n (Próximamente)</button>
+                </div>
+            </div>
         </div>
 
-        <!-- Dashboard: Rutina de hoy -->
-        <div class="card">
-            <h2>📅 Rutina de Hoy</h2>
-            <p id="today-routine">Cargando planificación del día...</p>
-        </div>
+        <!-- VISTA 2: EJERCICIOS Y EVOLUCIÓN (PRs y Pesos) -->
+        <div id="view-exercises" class="view-section">
+            <div class="card">
+                <h2>🏋️‍♂️ Ejercicios por Días (Día 1: Empuje)</h2>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 15px;">Tus pesos actuales registrados:</p>
+                
+                <div class="exercise-item">
+                    <div class="exercise-info">
+                        <h3>Press de Banca Inclinado</h3>
+                        <p>4 series x 8-10 repeticiones</p>
+                    </div>
+                    <div class="weight-badge">75 kg</div>
+                </div>
 
-        <!-- Dashboard: Comida asignada -->
-        <div class="card">
-            <h2>🍽️ Plan Nutricional</h2>
-            <p id="today-meal">Cargando menú del día...</p>
-        </div>
+                <div class="exercise-item">
+                    <div class="exercise-info">
+                        <h3>Jalón al Pecho</h3>
+                        <p>4 series x 10-12 repeticiones</p>
+                    </div>
+                    <div class="weight-badge">60 kg</div>
+                </div>
+            </div>
 
-        <!-- Módulo de Entrada (Texto / IA futura) -->
-        <div class="card">
-            <h2>🎙️ Registrar Entreno o Comida</h2>
-            <div class="input-section">
-                <textarea id="ai-input" placeholder="Ej: He hecho 4 series de press banca con 80kg, o sube foto de tu plato..."></textarea>
-                <button onclick="sendDataToN8n()">Enviar a n8n (Próximamente)</button>
+            <!-- Gráfica de evolución -->
+            <div class="card">
+                <h2>📈 Evolución de Pesos</h2>
+                <p style="font-size: 13px; color: var(--text-secondary);">Progreso histórico en Press Inclinado (kg)</p>
+                <div class="chart-container">
+                    <canvas id="weightChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Comprobar si ya estaba logueado
+        let myChart = null;
+
         window.onload = function() {
             if (localStorage.getItem("gym_logged_in") === "true") {
                 showApp();
             }
             loadDate();
+            loadCalendar();
+            checkTodayCreatine();
         }
 
         function handleLogin() {
@@ -260,6 +408,29 @@
         function showApp() {
             document.getElementById("login-screen").style.display = "none";
             document.getElementById("app-screen").style.display = "block";
+            // Renderizar gráfica si se abre
+        }
+
+        function switchView(viewName) {
+            const homeView = document.getElementById("view-home");
+            const exercisesView = document.getElementById("view-exercises");
+            const btnHome = document.getElementById("btn-home");
+            const btnExercises = document.getElementById("btn-exercises");
+
+            if (viewName === 'home') {
+                homeView.style.display = "block";
+                exercisesView.style.display = "none";
+                btnHome.classList.add("active");
+                btnExercises.classList.remove("active");
+            } else {
+                homeView.style.display = "none";
+                exercisesView.style.display = "block";
+                btnExercises.classList.add("active");
+                btnHome.classList.remove("active");
+                
+                // Inicializar gráfica al cambiar de pestaña para evitar errores de renderizado
+                setTimeout(initChart, 100);
+            }
         }
 
         function loadDate() {
@@ -267,21 +438,124 @@
             const today = new Date().toLocaleDateString('es-ES', options);
             document.getElementById("current-date").innerText = today;
             
-            // Simulación de datos dinámicos según el día
             document.getElementById("today-routine").innerText = "Pecho + Tríceps: Press banca (4x8), Aperturas (3x12), Fondos en paralelas (3 al fallo).";
             document.getElementById("today-meal").innerText = "Comida: Arroz con pechuga de pollo y aguacate.\nCena: Salmón al horno con verduras salteadas.";
         }
 
-        function toggleCreatine() {
+        function getTodayKey() {
+            const d = new Date();
+            return `creatine_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
+        }
+
+        function checkTodayCreatine() {
             const checkbox = document.getElementById("creatine-check");
             const statusText = document.getElementById("creatine-status-text");
-            if (checkbox.checked) {
+            const isCompleted = localStorage.getItem(getTodayKey()) === "true";
+
+            checkbox.checked = isCompleted;
+            if (isCompleted) {
                 statusText.innerText = "¡Tomada!";
                 statusText.style.color = "var(--success-color)";
             } else {
                 statusText.innerText = "Pendiente";
                 statusText.style.color = "var(--text-secondary)";
             }
+        }
+
+        function toggleCreatine() {
+            const checkbox = document.getElementById("creatine-check");
+            const statusText = document.getElementById("creatine-status-text");
+            
+            if (checkbox.checked) {
+                localStorage.setItem(getTodayKey(), "true");
+                statusText.innerText = "¡Tomada!";
+                statusText.style.color = "var(--success-color)";
+            } else {
+                localStorage.removeItem(getTodayKey());
+                statusText.innerText = "Pendiente";
+                statusText.style.color = "var(--text-secondary)";
+            }
+            loadCalendar();
+        }
+
+        function loadCalendar() {
+            const container = document.getElementById("calendar-container");
+            container.innerHTML = "";
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const todayDate = now.getDate();
+
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            document.getElementById("month-title").innerText = `Registro de ${monthNames[month]} ${year}`;
+
+            const daysOfWeek = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+            daysOfWeek.forEach(d => {
+                const div = document.createElement("div");
+                div.className = "calendar-day-name";
+                div.innerText = d;
+                container.appendChild(div);
+            });
+
+            const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                container.appendChild(document.createElement("div"));
+            }
+
+            for (let day = 1; day <= totalDays; day++) {
+                const dayDiv = document.createElement("div");
+                dayDiv.className = "calendar-day";
+                dayDiv.innerText = day;
+
+                if (day === todayDate) {
+                    dayDiv.classList.add("today");
+                }
+
+                const dayKey = `creatine_${year}_${month}_${day}`;
+                if (localStorage.getItem(dayKey) === "true") {
+                    dayDiv.classList.add("completed");
+                }
+
+                container.appendChild(dayDiv);
+            }
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('weightChart').getContext('2d');
+            
+            if (myChart) {
+                myChart.destroy(); // Evitar duplicados al recargar vista
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4 (Actual)'],
+                    datasets: [{
+                        label: 'Press Inclinado (kg)',
+                        data: [65, 70, 72.5, 75],
+                        borderColor: '#0a84ff',
+                        backgroundColor: 'rgba(10, 132, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#ffffff' } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#8e8e93' }, grid: { color: '#2c2c2e' } },
+                        y: { ticks: { color: '#8e8e93' }, grid: { color: '#2c2c2e' } }
+                    }
+                }
+            });
         }
 
         function sendDataToN8n() {
@@ -293,7 +567,6 @@
             alert("Texto listo para enviar a n8n en cuanto conectemos el Webhook:\n\n" + text);
         }
 
-        // Registro del Service Worker para PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js')
             .then(() => console.log("Service Worker registrado con éxito."));
