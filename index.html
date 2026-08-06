@@ -154,8 +154,8 @@
             background-color: var(--accent-color);
         }
 
-        /* Check Creatina */
-        .creatine-box {
+        /* Check Asistencia Gym */
+        .gym-box {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -212,7 +212,7 @@
             border: 2px solid var(--accent-color);
         }
 
-        /* Modal Calendario Anual */
+        /* Modal Calendario Anual por Meses */
         #calendar-modal {
             display: none;
             position: fixed;
@@ -221,7 +221,7 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
         }
 
         .modal-content {
@@ -229,30 +229,60 @@
             border-radius: 20px;
             padding: 20px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             max-height: 90vh;
             overflow-y: auto;
         }
 
-        .year-grid {
+        .months-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .month-card {
+            background-color: #2c2c2e;
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        .month-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 6px;
+            text-transform: capitalize;
+        }
+
+        .month-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 4px;
-            margin-top: 10px;
+            text-align: center;
         }
 
-        .year-day {
-            background-color: #2c2c2e;
+        .month-day-name {
+            font-size: 9px;
+            color: var(--text-secondary);
+            padding-bottom: 2px;
+        }
+
+        .month-day {
+            background-color: #1c1c1e;
             aspect-ratio: 1;
             border-radius: 4px;
             font-size: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: var(--text-secondary);
         }
 
-        .year-day.completed {
+        .month-day.completed {
             background-color: var(--success-color);
+            color: #000;
+            font-weight: 700;
         }
 
         /* Lista de ejercicios editable */
@@ -301,7 +331,6 @@
             padding: 4px;
         }
 
-        /* Formularios internos */
         .form-inline {
             background-color: #2c2c2e;
             padding: 15px;
@@ -315,7 +344,6 @@
             color: var(--text-color);
         }
 
-        /* Gráficas */
         .chart-container {
             position: relative;
             width: 100%;
@@ -337,15 +365,15 @@
         </div>
     </div>
 
-    <!-- MODAL CALENDARIO ANUAL HISTÓRICO -->
+    <!-- MODAL CALENDARIO ANUAL POR MESES -->
     <div id="calendar-modal" onclick="closeCalendarModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h2 id="modal-year-title" style="margin:0; font-size: 16px;">Historial Anual</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 id="modal-year-title" style="margin:0; font-size: 16px;">Historial Anual de Gym</h2>
                 <button onclick="closeCalendarModal()" style="width: auto; padding: 4px 10px; font-size: 12px; background-color: #3a3a3c;">Cerrar</button>
             </div>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Cada cuadrito verde es un día que tomaste tu creatina.</p>
-            <div id="full-year-container"></div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Días que has entrenado este año:</p>
+            <div class="months-container" id="full-year-months-container"></div>
         </div>
     </div>
 
@@ -367,15 +395,15 @@
 
         <!-- VISTA 1: INICIO (HOME) -->
         <div id="view-home" class="view-section" style="display: block;">
-            <!-- Dashboard: Creatina -->
-            <div class="card creatine-box">
+            <!-- Dashboard: Asistencia al Gym -->
+            <div class="card gym-box">
                 <div>
-                    <h2>Creatina</h2>
-                    <p style="font-size: 13px; color: var(--text-secondary);">Regístrala hoy</p>
+                    <h2>Asistencia al Gym</h2>
+                    <p style="font-size: 13px; color: var(--text-secondary);">¿Has entrenado hoy?</p>
                 </div>
                 <label class="checkbox-container">
-                    <input type="checkbox" id="creatine-check" onclick="toggleCreatine()">
-                    <span id="creatine-status-text" style="color: var(--text-secondary);">Pendiente</span>
+                    <input type="checkbox" id="gym-check" onclick="toggleGymAttendance()">
+                    <span id="gym-status-text" style="color: var(--text-secondary);">Falta / Descanso</span>
                 </label>
             </div>
 
@@ -391,11 +419,11 @@
                 <p id="today-meal">Cargando menú del día...</p>
             </div>
 
-            <!-- Mini Calendario Semanal (Clicable para abrir anual) -->
+            <!-- Mini Calendario Semanal (Clicable para abrir anual por meses) -->
             <div class="card" style="cursor: pointer;" onclick="openCalendarModal()">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h2>📊 Constancia Semanal</h2>
-                    <span style="font-size: 12px; color: var(--accent-color);">Ver Histórico Anual 🔍</span>
+                    <span style="font-size: 12px; color: var(--accent-color);">Ver Meses Anuales 🔍</span>
                 </div>
                 <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Semana actual (Lunes a Domingo)</p>
                 <div class="week-grid" id="week-container"></div>
@@ -419,9 +447,7 @@
                 <h2>🏋️‍♂️ Mis Ejercicios</h2>
                 <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Listado general de ejercicios y marcas actuales:</p>
                 
-                <div id="exercises-list-container">
-                    <!-- Se carga dinámicamente -->
-                </div>
+                <div id="exercises-list-container"></div>
 
                 <!-- Formulario para añadir ejercicio -->
                 <div class="form-inline">
@@ -436,9 +462,7 @@
             <!-- Gráfica de evolución de Ejercicios -->
             <div class="card">
                 <h2>📈 Evolución de Pesos por Ejercicio</h2>
-                <select id="exercise-select" onchange="updateExerciseChart()">
-                    <!-- Opciones dinámicas -->
-                </select>
+                <select id="exercise-select" onchange="updateExerciseChart()"></select>
                 <div class="chart-container">
                     <canvas id="exerciseChart"></canvas>
                 </div>
@@ -462,7 +486,6 @@
     </div>
 
     <script>
-        // Datos por defecto si no hay nada guardado
         let exercisesData = JSON.parse(localStorage.getItem("gym_exercises")) || [
             { id: 1, name: "Press de Banca Inclinado", details: "4 series x 8-10 reps", weight: 75, history: [65, 70, 72.5, 75] },
             { id: 2, name: "Jalón al Pecho", details: "4 series x 10-12 reps", weight: 60, history: [50, 55, 57.5, 60] }
@@ -482,7 +505,7 @@
             }
             loadDate();
             loadWeekCalendar();
-            checkTodayCreatine();
+            checkTodayGym();
         }
 
         function handleLogin() {
@@ -545,49 +568,49 @@
             document.getElementById("today-meal").innerText = "Comida: Arroz con pechuga de pollo y aguacate.\nCena: Salmón al horno con verduras salteadas.";
         }
 
-        function getTodayKey(d = new Date()) {
-            return `creatine_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
+        // Clave única basada en asistencia al gym por fecha
+        function getGymKey(d = new Date()) {
+            return `gym_attendance_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
         }
 
-        function checkTodayCreatine() {
-            const checkbox = document.getElementById("creatine-check");
-            const statusText = document.getElementById("creatine-status-text");
-            const isCompleted = localStorage.getItem(getTodayKey()) === "true";
+        function checkTodayGym() {
+            const checkbox = document.getElementById("gym-check");
+            const statusText = document.getElementById("gym-status-text");
+            const isCompleted = localStorage.getItem(getGymKey()) === "true";
 
             checkbox.checked = isCompleted;
             if (isCompleted) {
-                statusText.innerText = "¡Tomada!";
+                statusText.innerText = "¡Entrenado! 🚀";
                 statusText.style.color = "var(--success-color)";
             } else {
-                statusText.innerText = "Pendiente";
+                statusText.innerText = "Falta / Descanso";
                 statusText.style.color = "var(--text-secondary)";
             }
         }
 
-        function toggleCreatine() {
-            const checkbox = document.getElementById("creatine-check");
-            const statusText = document.getElementById("creatine-status-text");
+        function toggleGymAttendance() {
+            const checkbox = document.getElementById("gym-check");
+            const statusText = document.getElementById("gym-status-text");
             
             if (checkbox.checked) {
-                localStorage.setItem(getTodayKey(), "true");
-                statusText.innerText = "¡Tomada!";
+                localStorage.setItem(getGymKey(), "true");
+                statusText.innerText = "¡Entrenado! 🚀";
                 statusText.style.color = "var(--success-color)";
             } else {
-                localStorage.removeItem(getTodayKey());
-                statusText.innerText = "Pendiente";
+                localStorage.removeItem(getGymKey());
+                statusText.innerText = "Falta / Descanso";
                 statusText.style.color = "var(--text-secondary)";
             }
             loadWeekCalendar();
         }
 
-        // Mini Calendario de Lunes a Domingo de la semana actual
+        // Mini Calendario Semanal (L-D)
         function loadWeekCalendar() {
             const container = document.getElementById("week-container");
             container.innerHTML = "";
 
             const now = new Date();
-            const dayOfWeek = now.getDay(); // 0 es Domingo, 1 es Lunes...
-            // Ajustar para que Lunes sea 0 y Domingo 6
+            const dayOfWeek = now.getDay();
             const distanceToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
             
             const monday = new Date(now);
@@ -607,7 +630,7 @@
 
                 if (isToday) div.classList.add("today");
 
-                const key = getTodayKey(currentDay);
+                const key = getGymKey(currentDay);
                 if (localStorage.getItem(key) === "true") {
                     div.classList.add("completed");
                 }
@@ -617,40 +640,70 @@
             }
         }
 
-        // Modal Calendario Anual Histórico (Perpetuo)
+        // Modal Calendario Anual Separado por Meses
         function openCalendarModal() {
             const modal = document.getElementById("calendar-modal");
             modal.style.display = "flex";
             
             const now = new Date();
             const year = now.getFullYear();
-            document.getElementById("modal-year-title").innerText = `Historial Anual (${year})`;
+            document.getElementById("modal-year-title").innerText = `Historial Gym (${year})`;
 
-            const container = document.getElementById("full-year-container");
+            const container = document.getElementById("full-year-months-container");
             container.innerHTML = "";
 
-            // Crear una cuadrícula continua para todo el año (365/366 días)
-            const grid = document.createElement("div");
-            grid.className = "year-grid";
-            grid.style.gridTemplateColumns = "repeat(15, 1fr)"; // 15 días por fila para que quede compacto
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            const daysOfWeekHeader = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
-            const startDate = new Date(year, 0, 1);
-            const endDate = new Date(year, 11, 31);
+            for (let m = 0; m < 12; m++) {
+                const monthCard = document.createElement("div");
+                monthCard.className = "month-card";
 
-            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-                const dayBox = document.createElement("div");
-                dayBox.className = "year-day";
-                
-                const key = `creatine_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
-                if (localStorage.getItem(key) === "true") {
-                    dayBox.classList.add("completed");
+                const title = document.createElement("div");
+                title.className = "month-title";
+                title.innerText = monthNames[m];
+                monthCard.appendChild(title);
+
+                const grid = document.createElement("div");
+                grid.className = "month-grid";
+
+                // Cabecera días de la semana
+                daysOfWeekHeader.forEach(dName => {
+                    const dHeader = document.createElement("div");
+                    dHeader.className = "month-day-name";
+                    dHeader.innerText = dName;
+                    grid.appendChild(dHeader);
+                });
+
+                // Días del mes
+                const firstDayIndex = (new Date(year, m, 1).getDay() + 6) % 7;
+                const totalDays = new Date(year, m + 1, 0).getDate();
+
+                // Espacios vacíos iniciales
+                for (let i = 0; i < firstDayIndex; i++) {
+                    const emptyCell = document.createElement("div");
+                    grid.appendChild(emptyCell);
                 }
-                
-                // Tooltip simple con la fecha
-                dayBox.title = d.toLocaleDateString('es-ES');
-                grid.appendChild(dayBox);
+
+                // Días reales
+                for (let day = 1; day <= totalDays; day++) {
+                    const dayCell = document.createElement("div");
+                    dayCell.className = "month-day";
+                    dayCell.innerText = day;
+
+                    const dateObj = new Date(year, m, day);
+                    const key = getGymKey(dateObj);
+
+                    if (localStorage.getItem(key) === "true") {
+                        dayCell.classList.add("completed");
+                    }
+
+                    grid.appendChild(dayCell);
+                }
+
+                monthCard.appendChild(grid);
+                container.appendChild(monthCard);
             }
-            container.appendChild(grid);
         }
 
         function closeCalendarModal() {
@@ -666,7 +719,6 @@
             selectContainer.innerHTML = "";
 
             exercisesData.forEach((ex, index) => {
-                // Renderizar en la lista
                 const item = document.createElement("div");
                 item.className = "exercise-item";
                 item.innerHTML = `
@@ -681,7 +733,6 @@
                 `;
                 listContainer.appendChild(item);
 
-                // Renderizar en el selector de la gráfica
                 const option = document.createElement("option");
                 option.value = index;
                 option.innerText = ex.name;
@@ -704,12 +755,11 @@
                 name: name,
                 details: details || "3 series x 10 reps",
                 weight: weight,
-                history: [weight] // Historial inicial con el primer peso
+                history: [weight]
             });
 
             localStorage.setItem("gym_exercises", JSON.stringify(exercisesData));
             
-            // Limpiar inputs
             document.getElementById("new-ex-name").value = "";
             document.getElementById("new-ex-details").value = "";
             document.getElementById("new-ex-weight").value = "";
