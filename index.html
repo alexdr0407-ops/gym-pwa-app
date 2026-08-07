@@ -788,7 +788,6 @@
                     <canvas id="exerciseChart"></canvas>
                 </div>
 
-                <!-- NUEVA SECCIÓN: Listado de registros históricos del ejercicio seleccionado para poder borrarlos -->
                 <div style="margin-top: 15px;">
                     <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--text-secondary);">Registros de marcas (Historial):</h3>
                     <div id="exercise-history-list" style="max-height: 150px; overflow-y: auto;"></div>
@@ -807,6 +806,13 @@
                 <div class="chart-container">
                     <canvas id="bodyWeightChart"></canvas>
                 </div>
+
+                <!-- SECCIÓN: Listado de registros del peso corporal con opción de borrar -->
+                <div style="margin-top: 15px;">
+                    <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--text-secondary);">Registros de peso corporal (Historial):</h3>
+                    <div id="body-weight-history-list" style="max-height: 150px; overflow-y: auto;"></div>
+                </div>
+
                 <div class="form-inline" style="margin-top: 15px;">
                     <h3>➕ Registrar Mi Peso de Hoy</h3>
                     <input type="number" step="0.1" id="new-body-weight" placeholder="Tu peso actual (ej: 75.5)">
@@ -993,6 +999,7 @@
             updateFoodOptionsDropdown();
             renderShoppingListUI();
             renderTodayAssignedExercises();
+            renderBodyWeightHistoryList();
         }
 
         function switchView(viewName) {
@@ -1625,7 +1632,7 @@
             const todayFormatted = getFormattedShortDate();
             currentEx.dates.push(todayFormatted);
             currentEx.history.push(weightVal);
-            currentEx.weight = weightVal; // Actualiza el peso actual principal
+            currentEx.weight = weightVal;
 
             localStorage.setItem("gym_exercises", JSON.stringify(exercisesData));
             document.getElementById("new-ex-record-weight").value = "";
@@ -1638,7 +1645,6 @@
         function deleteExerciseRecord(exIndex, hIndex) {
             const currentEx = exercisesData[exIndex];
             
-            // Evitar borrar si solo queda 1 registro para no romper la gráfica
             if (currentEx.history.length <= 1) {
                 showAppleAlert("Aviso", "El ejercicio necesita al menos un registro histórico. Si deseas quitarlo por completo, borra el ejercicio desde la lista general.");
                 return;
@@ -1646,14 +1652,76 @@
 
             currentEx.history.splice(hIndex, 1);
             currentEx.dates.splice(hIndex, 1);
-
-            // Actualizar el peso principal al último valor disponible
             currentEx.weight = currentEx.history[currentEx.history.length - 1];
 
             localStorage.setItem("gym_exercises", JSON.stringify(exercisesData));
             renderExercisesUI();
             initCharts();
             showAppleAlert("Registro borrado", "Se ha eliminado la entrada seleccionada del historial.");
+        }
+
+        // --- FUNCIONES DE HISTORIAL DE PESO CORPORAL ---
+        function renderBodyWeightHistoryList() {
+            const container = document.getElementById("body-weight-history-list");
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (!bodyWeightData || !bodyWeightData.data || bodyWeightData.data.length === 0) {
+                container.innerHTML = `<p style="font-size: 12px; color: var(--text-secondary);">No hay registros de peso corporal.</p>`;
+                return;
+            }
+
+            bodyWeightData.data.forEach((weightVal, index) => {
+                const dateVal = bodyWeightData.dates[index] || "Reciente";
+                const row = document.createElement("div");
+                row.style.display = "flex";
+                row.style.justifyContent = "space-between";
+                row.style.alignItems = "center";
+                row.style.backgroundColor = "#2c2c2e";
+                row.style.padding = "6px 10px";
+                row.style.borderRadius = "6px";
+                row.style.marginBottom = "4px";
+                row.style.fontSize = "13px";
+
+                row.innerHTML = `
+                    <span>📅 ${dateVal} — <b>${weightVal} kg</b></span>
+                    <button class="delete-btn" style="font-size: 13px;" onclick="deleteBodyWeightRecord(${index})">🗑️</button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function addBodyWeight() {
+            const val = parseFloat(document.getElementById("new-body-weight").value);
+            if (isNaN(val)) {
+                showAppleAlert("Valor inválido", "Introduce un peso en kg correcto.");
+                return;
+            }
+
+            bodyWeightData.dates.push(getFormattedShortDate());
+            bodyWeightData.data.push(val);
+
+            localStorage.setItem("gym_body_weight", JSON.stringify(bodyWeightData));
+            document.getElementById("new-body-weight").value = "";
+            
+            initBodyWeightChart();
+            renderBodyWeightHistoryList();
+            showAppleAlert("Registrado", "Tu peso corporal ha sido actualizado.");
+        }
+
+        function deleteBodyWeightRecord(index) {
+            if (bodyWeightData.data.length <= 1) {
+                showAppleAlert("Aviso", "Debes mantener al menos un registro de peso corporal en el historial.");
+                return;
+            }
+
+            bodyWeightData.data.splice(index, 1);
+            bodyWeightData.dates.splice(index, 1);
+
+            localStorage.setItem("gym_body_weight", JSON.stringify(bodyWeightData));
+            initBodyWeightChart();
+            renderBodyWeightHistoryList();
+            showAppleAlert("Registro borrado", "Se ha eliminado la entrada seleccionada de tu peso corporal.");
         }
 
         function initCharts() {
@@ -1727,22 +1795,7 @@
                     }
                 }
             });
-        }
-
-        function addBodyWeight() {
-            const val = parseFloat(document.getElementById("new-body-weight").value);
-            if (isNaN(val)) {
-                showAppleAlert("Valor inválido", "Introduce un peso en kg correcto.");
-                return;
-            }
-
-            bodyWeightData.dates.push(getFormattedShortDate());
-            bodyWeightData.data.push(val);
-
-            localStorage.setItem("gym_body_weight", JSON.stringify(bodyWeightData));
-            document.getElementById("new-body-weight").value = "";
-            initBodyWeightChart();
-            showAppleAlert("Registrado", "Tu peso corporal ha sido actualizado.");
+            renderBodyWeightHistoryList();
         }
 
         function sendDataToN8n() {
