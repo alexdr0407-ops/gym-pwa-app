@@ -19,11 +19,12 @@
             --bg-color: #000000;
             --card-bg: #1c1c1e;
             --accent-color: #0a84ff;
+            --accent-pink: #ff2d55;
             --text-color: #ffffff;
             --text-secondary: #8e8e93;
             --success-color: #30d158;
             --danger-color: #ff453a;
-            --pink-color: #ff2d55;
+            --nutrition-color: #00d2ff;
         }
 
         * {
@@ -37,10 +38,9 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             padding: 20px;
-            padding-bottom: 60px;
+            padding-bottom: 50px;
         }
 
-        /* Pantalla de Login */
         #login-screen {
             display: flex;
             flex-direction: column;
@@ -99,7 +99,6 @@
             display: none;
         }
 
-        /* Vistas de la App */
         .view-section {
             display: none;
         }
@@ -137,21 +136,17 @@
             line-height: 1.4;
         }
 
-        /* Botones de navegación */
         .nav-buttons {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             margin-bottom: 15px;
-            overflow-x: auto;
         }
 
         .nav-buttons button {
             background-color: #2c2c2e;
             color: var(--text-color);
             font-size: 13px;
-            padding: 10px 14px;
-            white-space: nowrap;
-            width: auto;
+            padding: 10px;
             flex: 1;
         }
 
@@ -159,53 +154,135 @@
             background-color: var(--accent-color);
         }
 
-        /* Anillos de Actividad Concéntricos (Pasos y Calorías) */
-        .rings-container {
+        .gym-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .checkbox-container input {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--success-color);
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .week-day {
+            background-color: #2c2c2e;
+            border-radius: 8px;
+            padding: 8px 0;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .week-day span {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        .week-day.completed {
+            background-color: rgba(48, 209, 88, 0.2);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .week-day.today {
+            border: 2px solid var(--accent-color);
+        }
+
+        #calendar-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .months-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .month-card {
+            background-color: #2c2c2e;
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        .month-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 6px;
+            text-transform: capitalize;
+        }
+
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .month-day-name {
+            font-size: 9px;
+            color: var(--text-secondary);
+            padding-bottom: 2px;
+        }
+
+        .month-day {
+            background-color: #1c1c1e;
+            aspect-ratio: 1;
+            border-radius: 4px;
+            font-size: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 20px 0;
-            position: relative;
+            color: var(--text-secondary);
         }
 
-        .rings-svg {
-            transform: rotate(-90deg);
-        }
-
-        .ring-bg {
-            fill: none;
-            stroke: #2c2c2e;
-        }
-
-        .ring-progress {
-            fill: none;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.5s ease;
-        }
-
-        .rings-text {
-            position: absolute;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .rings-text .kcal-label {
-            color: var(--accent-color);
-            font-size: 18px;
+        .month-day.completed {
+            background-color: var(--success-color);
+            color: #000;
             font-weight: 700;
         }
 
-        .rings-text .steps-label {
-            color: var(--pink-color);
-            font-size: 14px;
-            font-weight: 600;
-            margin-top: 2px;
-        }
-
-        /* Listas y Formularios */
-        .item-row {
+        .exercise-item {
             background-color: #2c2c2e;
             padding: 12px;
             border-radius: 10px;
@@ -213,6 +290,31 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .exercise-info h3 {
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+
+        .exercise-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .exercise-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .weight-badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
         }
 
         .delete-btn {
@@ -232,6 +334,12 @@
             margin-top: 15px;
         }
 
+        .form-inline h3 {
+            font-size: 15px;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
         .chart-container {
             position: relative;
             width: 100%;
@@ -239,16 +347,74 @@
             margin-top: 10px;
         }
 
-        /* Input de archivo camuflado */
-        .file-input-wrapper {
+        /* Estilos de Anillos Duales Apple Style */
+        .rings-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
             position: relative;
-            margin-bottom: 10px;
         }
-        .file-input-wrapper input[type="file"] {
+        .rings-wrapper {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #dualRingsCanvas {
             position: absolute;
-            left: 0; top: 0; opacity: 0;
-            width: 100%; height: 100%;
-            cursor: pointer;
+            top: 0;
+            left: 0;
+        }
+        .rings-text-center {
+            text-align: center;
+            z-index: 2;
+        }
+        .rings-text-center span {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: block;
+        }
+        .rings-text-center b {
+            font-size: 15px;
+            color: var(--text-color);
+        }
+
+        .meal-item {
+            background-color: #2c2c2e;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .meal-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .meal-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .meal-kcal {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--nutrition-color);
+        }
+
+        .shopping-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #38383a;
+            font-size: 14px;
+        }
+        .shopping-row:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
@@ -265,12 +431,24 @@
         </div>
     </div>
 
+    <!-- MODAL CALENDARIO ANUAL POR MESES -->
+    <div id="calendar-modal" onclick="closeCalendarModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 id="modal-year-title" style="margin:0; font-size: 16px;">Historial Anual de Gym</h2>
+                <button onclick="closeCalendarModal()" style="width: auto; padding: 4px 10px; font-size: 12px; background-color: #3a3a3c;">Cerrar</button>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Días que has entrenado este año:</p>
+            <div class="months-container" id="full-year-months-container"></div>
+        </div>
+    </div>
+
     <!-- APLICACIÓN PRINCIPAL -->
     <div id="app-screen" style="display: none;">
         <div class="header">
             <div>
                 <div class="date-title" id="current-date">CARGANDO FECHA...</div>
-                <h1 style="margin-bottom:0;">Hola máquina 🔥</h1>
+                <h1 style="margin-bottom:0;">Hola máquina </h1>
             </div>
             <button onclick="handleLogout()" style="width: auto; padding: 6px 12px; font-size: 12px; background-color: #3a3a3c;">Salir</button>
         </div>
@@ -278,171 +456,228 @@
         <!-- Botones de navegación superior -->
         <div class="nav-buttons">
             <button id="btn-home" class="active" onclick="switchView('home')">🏠 Hoy</button>
+            <button id="btn-nutrition" onclick="switchView('nutrition')">🍽️ Dieta</button>
             <button id="btn-exercises" onclick="switchView('exercises')">📈 Ejercicios</button>
-            <button id="btn-nutrition" onclick="switchView('nutrition')">🍏 Alimentación</button>
         </div>
 
         <!-- VISTA 1: INICIO (HOME) -->
         <div id="view-home" class="view-section" style="display: block;">
             
-            <!-- Anillos concéntricos de Actividad -->
-            <div class="card" style="text-align: center;">
-                <h2>Progreso Diario</h2>
-                <div class="rings-container">
-                    <svg class="rings-svg" width="160" height="160">
-                        <!-- Anillo Exterior (Rosa - Pasos de Apple Health) -->
-                        <circle class="ring-bg" cx="80" cy="80" r="65" stroke-width="12"/>
-                        <circle id="ring-steps" class="ring-progress" cx="80" cy="80" r="65" stroke-width="12" stroke="--pink-color" style="stroke: var(--pink-color); stroke-dasharray: 408.4; stroke-dashoffset: 408.4;"/>
-                        
-                        <!-- Anillo Interior (Azul - Calorías Ingeridas) -->
-                        <circle class="ring-bg" cx="80" cy="80" r="45" stroke-width="12"/>
-                        <circle id="ring-calories" class="ring-progress" cx="80" cy="80" r="45" stroke-width="12" stroke="--accent-color" style="stroke: var(--accent-color); stroke-dasharray: 282.7; stroke-dashoffset: 282.7;"/>
-                    </svg>
-                    <div class="rings-text">
-                        <span class="kcal-label" id="txt-kcal-ingeridas">0 / 2500 kcal</span>
-                        <span class="steps-label" id="txt-steps-health">0 / 10K pasos</span>
+            <!-- Dashboard de Anillos Concéntricos (Apple Style) -->
+            <div class="card rings-box">
+                <div class="rings-wrapper">
+                    <canvas id="dualRingsCanvas" width="160" height="160"></canvas>
+                    <div class="rings-text-center">
+                        <span id="calories-ring-text">0 / 2500 kcal</span>
+                        <b id="steps-ring-text">0 pasos</b>
                     </div>
+                </div>
+                <div style="display: flex; gap: 15px; margin-top: 12px; font-size: 11px; color: var(--text-secondary);">
+                    <span style="color: var(--nutrition-color);">● Calorías Ingeridas</span>
+                    <span style="color: var(--accent-pink);">● Pasos (Apple Health)</span>
                 </div>
             </div>
 
-            <!-- Dashboard: Rutina de hoy (Diferenciada automáticamente por día) -->
-            <div class="card">
-                <h2>📅 Rutina de Hoy (<span id="routine-day-name">-</span>)</h2>
-                <p id="today-routine" style="white-space: pre-line; font-weight: 500;">Cargando rutina...</p>
+            <!-- Dashboard: Asistencia al Gym -->
+            <div class="card gym-box">
+                <div>
+                    <h2>Asistencia al Gym</h2>
+                    <p style="font-size: 13px; color: var(--text-secondary);">¿Has entrenado hoy?</p>
+                </div>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="gym-check" onclick="toggleGymAttendance()">
+                    <span id="gym-status-text" style="color: var(--text-secondary);">Falta / Descanso</span>
+                </label>
             </div>
 
-            <!-- Dashboard: Comida asignada -->
+            <!-- Dashboard: Rutina de hoy (Específica por día) -->
             <div class="card">
-                <h2>🍽️ Plan Nutricional Asignado</h2>
-                <p id="today-meal" style="white-space: pre-line;">Cargando menú del día...</p>
+                <h2>📅 Rutina de Hoy: <span id="routine-title-day" style="color: var(--accent-color);"></span></h2>
+                <p id="today-routine">Cargando planificación del día...</p>
             </div>
 
-            <!-- Módulo de Entrada de IA (Acepta foto + texto para Gemini vía n8n) -->
+            <!-- Dashboard: Comida asignada del día -->
             <div class="card">
-                <h2>🎙️ Registrar Comida o Entreno con IA</h2>
-                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Sube una foto de tu plato para calcular calorías con Gemini y n8n.</p>
+                <h2>🍽️ Plan Nutricional de Hoy</h2>
+                <p id="today-meal">Cargando menú asignado...</p>
+            </div>
+
+            <!-- Mini Calendario Semanal -->
+            <div class="card" style="cursor: pointer;" onclick="openCalendarModal()">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>📊 Constancia Semanal</h2>
+                    <span style="font-size: 12px; color: var(--accent-color);">Ver Meses 🔍</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Semana actual (Lunes a Domingo)</p>
+                <div class="week-grid" id="week-container"></div>
+            </div>
+
+            <!-- Entrada de texto plano para n8n de entreno -->
+            <div class="card">
+                <h2>🎙️ Registrar Entreno con Texto</h2>
                 <div class="input-section">
-                    <div class="file-input-wrapper">
-                        <button type="button" style="background-color: #3a3a3c;">📸 Seleccionar Foto de Comida</button>
-                        <input type="file" id="ai-image" accept="image/*">
-                    </div>
-                    <div id="image-status" style="font-size: 12px; color: var(--success-color); margin-bottom: 8px; display: none;">✓ Imagen cargada listo para enviar</div>
-                    <textarea id="ai-input" placeholder="Ej: Me estoy comiendo este plato de arroz con pollo, calcula las macros..."></textarea>
-                    <button onclick="sendDataToN8n()">Enviar a n8n + Gemini</button>
+                    <textarea id="ai-input" placeholder="Ej: He hecho 4 series de press banca con 80kg..." style="height:70px; resize:none; margin-bottom:10px;"></textarea>
+                    <button onclick="sendDataToN8n()">Enviar a n8n</button>
                 </div>
             </div>
         </div>
 
-        <!-- VISTA 2: EJERCICIOS Y EVOLUCIÓN -->
-        <div id="view-exercises" class="view-section">
-            <div class="card">
-                <h2>🏋️‍♂️ Mis Ejercicios Personalizados</h2>
-                <div id="exercises-list-container"></div>
-                <div class="form-inline">
-                    <h3>➕ Añadir Nuevo Ejercicio</h3>
-                    <input type="text" id="new-ex-name" placeholder="Nombre (ej: Press Banca)">
-                    <input type="text" id="new-ex-details" placeholder="Series y Reps (ej: 4x8)">
-                    <input type="number" id="new-ex-weight" placeholder="Peso actual (kg)">
-                    <button onclick="addNewExercise()">Guardar Ejercicio</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>📈 Evolución de Pesos</h2>
-                <select id="exercise-select" onchange="updateExerciseChart()"></select>
-                <div class="chart-container"><canvas id="exerciseChart"></canvas></div>
-            </div>
-        </div>
-
-        <!-- VISTA 3: ALIMENTACIÓN Y NUTRICIÓN -->
+        <!-- VISTA 2: ALIMENTACIÓN Y LISTA DE LA COMPRA -->
         <div id="view-nutrition" class="view-section">
-            <!-- Diario / Registro Manual de comidas del día -->
             <div class="card">
-                <h2>🍳 Registrar Comida Manual (Hoy)</h2>
-                <div id="meals-list-container"></div>
-                <div class="form-inline">
-                    <select id="new-meal-type">
-                        <option value="Desayuno">Desayuno</option>
-                        <option value="Comida">Comida</option>
-                        <option value="Cena">Cena</option>
-                        <option value="Snack">Snack / Otros</option>
-                    </select>
-                    <input type="text" id="new-meal-name" placeholder="Descripción (ej: Tortilla de 3 huevos)">
-                    <input type="number" id="new-body-kcal" placeholder="Calorías aproximadas (kcal)">
-                    <button onclick="addManualMeal()">Añadir al día</button>
+                <h2>🤖 Analizador de Platos por IA</h2>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Sube o haz una foto de tu comida y descríbela opcionalmente para que Gemini devuelva las calorías y macros:</p>
+                
+                <div style="background-color: #1c1c1e;">
+                    <input type="file" id="ai-image" accept="image/*" style="padding: 8px 0; background: transparent; border: none; margin-bottom: 8px;">
+                    <textarea id="ai-nutrition-text" placeholder="Ej: Desayuno: 3 huevos, 50g avena y un plátano..." style="height:60px; resize:none; margin-bottom:10px;"></textarea>
+                    <button onclick="sendMealToGeminiN8n()" style="background-color: var(--nutrition-color); color: #000;">📸 Enviar Foto a Gemini via n8n</button>
+                    <p id="image-status" style="font-size: 12px; margin-top: 8px; display: none; text-align: center;"></p>
                 </div>
+            </div>
+
+            <!-- Registro manual de Comida, Cena o Desayuno -->
+            <div class="card">
+                <h2>➕ Añadir Comida Manualmente</h2>
+                <select id="manual-meal-type">
+                    <option value="Desayuno">Desayuno</option>
+                    <option value="Comida">Comida</option>
+                    <option value="Cena">Cena</option>
+                    <option value="Snack / Extra">Snack / Extra</option>
+                </select>
+                <input type="text" id="manual-meal-name" placeholder="Nombre del alimento o plato">
+                <input type="number" id="manual-meal-kcal" placeholder="Calorías (kcal)">
+                <button onclick="addManualMeal()">Guardar en el Anillo</button>
+            </div>
+
+            <!-- Historial de platos del día -->
+            <div class="card">
+                <h2>📋 Alimentos Registrados Hoy</h2>
+                <div id="meals-list-container" style="margin-top: 10px;"></div>
             </div>
 
             <!-- Lista de la Compra -->
             <div class="card">
                 <h2>🛒 Lista de la Compra</h2>
-                <div id="shopping-list-container"></div>
-                <div class="form-inline">
-                    <input type="text" id="shop-item-name" placeholder="Alimento (ej: Pechuga de Pollo)">
-                    <input type="text" id="shop-item-weight" placeholder="Cantidad / Peso (ej: 1 kg o 3 packs)">
-                    <button onclick="addShoppingItem()">Añadir a la lista</button>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;">Alimentos y pesos necesarios para tu semana:</p>
+                <div id="shopping-list-container">
+                    <div class="shopping-row"><span>Pechuga de Pollo</span><b>2.5 kg</b></div>
+                    <div class="shopping-row"><span>Arroz Blanco</span><b>1.5 kg</b></div>
+                    <div class="shopping-row"><span>Huevos camperos</span><b>2 docenas</b></div>
+                    <div class="shopping-row"><span>Salmón fresco</span><b>600 g</b></div>
+                    <div class="shopping-row"><span>Avena en copos</span><b>1 kg</b></div>
+                    <div class="shopping-row"><span>Aguacates</span><b>4 unidades</b></div>
                 </div>
             </div>
         </div>
 
+        <!-- VISTA 3: EJERCICIOS Y EVOLUCIÓN -->
+        <div id="view-exercises" class="view-section">
+            <div class="card">
+                <h2>🏋️‍♂️ Mis Ejercicios</h2>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Listado general de ejercicios y marcas actuales:</p>
+                
+                <div id="exercises-list-container"></div>
+
+                <div class="form-inline">
+                    <h3>➕ Añadir Nuevo Ejercicio</h3>
+                    <input type="text" id="new-ex-name" placeholder="Nombre (ej: Press Banca)">
+                    <input type="text" id="new-ex-details" placeholder="Series y Reps (ej: 4 series x 8 reps)">
+                    <input type="number" id="new-ex-weight" placeholder="Peso actual en kg (ej: 80)">
+                    <button onclick="addNewExercise()">Guardar Ejercicio</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📈 Evolución de Pesos por Ejercicio</h2>
+                <select id="exercise-select" onchange="updateExerciseChart()"></select>
+                <div class="chart-container">
+                    <canvas id="exerciseChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⚖️ Evolución de mi Peso Corporal</h2>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">Control de tu peso (kg)</p>
+                <div class="chart-container">
+                    <canvas id="bodyWeightChart"></canvas>
+                </div>
+                <div class="form-inline" style="margin-top: 15px;">
+                    <h3>➕ Registrar Mi Peso de Hoy</h3>
+                    <input type="number" step="0.1" id="new-body-weight" placeholder="Tu peso actual (ej: 75.5)">
+                    <button onclick="addBodyWeight()">Añadir Registro</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Inicialización de bases de datos locales
+        // --- BASE DE DATOS LOCAL Y ESTADO ---
         let exercisesData = JSON.parse(localStorage.getItem("gym_exercises")) || [];
-        let shoppingList = JSON.parse(localStorage.getItem("gym_shopping")) || [
-            { name: "Arroz Integral", weight: "2 kg" },
-            { name: "Huevos", weight: "2 docenas" }
-        ];
+        let bodyWeightData = JSON.parse(localStorage.getItem("gym_body_weight")) || { dates: [], data: [] };
         
-        // Registro diario de calorías y comidas manuales
         let dailyCalories = parseInt(localStorage.getItem("gym_calories_count")) || 0;
-        let dailySteps = parseInt(localStorage.getItem("gym_steps_count")) || 4500; // Simulación inicial de Apple Health
+        let targetCalories = 2500; 
+        let dailySteps = parseInt(localStorage.getItem("gym_steps_count")) || 4200; // Simulado o vía Atajo Apple Health
+        let targetSteps = 10000;
         let mealsData = JSON.parse(localStorage.getItem("gym_meals_today")) || [];
 
-        // Rutinas fijas por día (Punto 3)
-        const routinesConfig = {
-            1: { name: "Lunes (Push)", detail: "- Press de Banca Inclinado: 4x8\n- Press Militar con Mancuernas: 4x10\n- Cruces en Polea: 3x12\n- Extensión de Tríceps en Polea: 4x12" },
-            2: { name: "Martes (Crossfit)", detail: "- WOD Emom 20 min:\n- 15 Kettlebell Swings\n- 12 Burpees\n- 10 Box Jumps\n- Máximos Wall Balls" },
-            3: { name: "Miércoles (Pull)", detail: "- Dominadas: 4 al fallo\n- Remo con barra: 4x8\n- Jalón al pecho: 3x10\n- Curl de Bíceps con barra Z: 4x12" },
-            4: { name: "Jueves (Crossfit + Brazo)", detail: "- AMRAP 15 min de acondicionamiento.\n- Curl Martillo: 3x12\n- Fondos en paralelas: 3x10\n- Curl concentrado: 3x15" },
-            5: { name: "Viernes (Pierna)", detail: "- Sentadillas Traseras: 4x6\n- Prensa de Piernas: 4x10\n- Peso Muerto Rumano: 3x10\n- Elevación de Gemelos: 4x15" },
-            6: { name: "Sábado (Torso)", detail: "- Press Banca Plano: 3x8\n- Remo con Mancuerna: 3x8\n- Press Arnold: 3x10\n- Pájaros en polea: 3x12" },
-            0: { name: "Domingo (Descanso)", detail: "¡Día de descanso total! Recupera bien, estira y camina ligero." }
-        };
-
-        // Menús fijos por día (Punto 4)
-        const mealsConfig = {
-            1: "Desayuno: Avena con proteínas y plátano.\nComida: Arroz con pollo y brócoli.\nCena: Tortilla de claras con pavo y ensalada.",
-            2: "Desayuno: Tostadas con aguacate y huevo.\nComida: Pasta integral con carne picada de ternera.\nCena: Pescado blanco con patata cocida.",
-            3: "Desayuno: Tortitas de avena.\nComida: Lentejas con verduras y arroz.\nCena: Pechuga de pavo a la plancha con espárragos.",
-            4: "Desayuno: Batido de frutas y proteínas.\nComida: Salmón con quinoa.\nCena: Revuelto de setas y gambas con ensalada.",
-            5: "Desayuno: Gachas de avena y crema de cacahuete.\nComida: Puré de patatas con filete de ternera.\nCena: Atún a la plancha con ensalada verde.",
-            6: "Desayuno: Huevos revueltos con jamón.\nComida: Arroz tres delicias con pollo.\nCena: Recarga libre controlada o fajitas de pollo.",
-            0: "Día de mantenimiento / Menú libre intuitivo manteniendo proteínas."
-        };
-
         let exChart = null;
+        let bwChart = null;
+
+        // Configuración de Rutinas Específicas por Día de la Semana (0: Domingo, 1: Lunes...)
+        const weekRoutines = {
+            1: { name: "Push (Lunes)", details: "Press banca plano, Press militar con mancuernas, Aperturas en polea y Extensiones de tríceps." },
+            2: { name: "Crossfit (Martes)", details: "WOD MetCon: 5 Rondas de Thrusters, Pull-ups y Burpees over bar." },
+            3: { name: "Pull (Miércoles)", details: "Dominadas estrictas, Remo con barra, Pulldown al pecho y Curl de bíceps alterno." },
+            4: { name: "Crossfit y Brazo (Jueves)", details: "WOD de técnica gimnástica + Bloque hipertrofia exclusivo de bíceps y tríceps." },
+            5: { name: "Pierna (Viernes)", details: "Sentadilla libre, Prensa inclinada, Extensiones de cuádriceps y Curl femoral tumbado." },
+            6: { name: "Torso (Sábado)", details: "Press inclinado con mancuernas, Remo en punta, Elevaciones laterales y Face pulls." },
+            0: { name: "Descanso (Domingo)", details: "Día libre de recuperación activa, movilidad articular y descanso total." }
+        };
+
+        // Plan nutricional por día (puedes adaptarlo cuando quieras)
+        const weekMealsPlan = {
+            1: "Desayuno: Avena con proteína. / Comida: Arroz con pechuga y aguacate. / Cena: Pescado blanco al horno con espárragos.",
+            2: "Desayuno: Tostadas con pavo y huevos. / Comida: Pasta integral con ternera picada. / Cena: Tortilla francesa de 4 claras y 1 yema con atún.",
+            3: "Desayuno: Tortitas de avena y plátano. / Comida: Puré de patata y salmón a la plancha. / Cena: Ensalada completa con pollo desmenuzado.",
+            4: "Desayuno: Yogur griego con frutos rojos y nueces. / Comida: Arroz basmati con ternera magra. / Cena: Merluza al vapor con patata cocida.",
+            5: "Desayuno: Batido de proteínas con mantequilla de cacahuete. / Comida: Macarrones integrales con atún y tomate. / Cena: Tortilla de verduras.",
+            6: "Desayuno: Huevos revueltos con pan tostado integral. / Comida: Patata asada con pechuga a la plancha. / Cena: Crema de verduras y tortilla.",
+            0: "Desayuno: Desayuno libre moderado. / Comida: Comida familiar libre controlada. / Cena: Ligera de verdura y pescado."
+        };
 
         window.onload = function() {
-            if (localStorage.getItem("gym_logged_in") === "true") showApp();
-            loadDateAndRoutine();
-            updateRings();
+            if (localStorage.getItem("gym_logged_in") === "true") {
+                showApp();
+            }
+            loadDate();
+            loadWeekCalendar();
+            checkTodayGym();
+            loadRoutineAndMeal();
+            drawDualRings();
+            renderNutritionUI();
 
-            // Detector para avisar visualmente que la foto está cargada
-            document.getElementById('ai-image').addEventListener('change', function() {
-                if(this.files.length > 0) document.getElementById('image-status').style.display = "block";
-            });
+            // Sincronización pasiva simulada con Apple Health (Atajo iOS)
+            setTimeout(() => {
+                const healthSteps = localStorage.getItem("gym_steps_sync");
+                if(healthSteps) {
+                    dailySteps = parseInt(healthSteps);
+                    drawDualRings();
+                }
+            }, 1000);
         }
 
         function handleLogin() {
             const user = document.getElementById("username").value.trim();
             const pass = document.getElementById("password").value.trim();
+            const errorDiv = document.getElementById("error-msg");
+
             if (user === "alex" && pass === "1432") {
                 localStorage.setItem("gym_logged_in", "true");
                 showApp();
             } else {
-                document.getElementById("error-msg").style.display = "block";
+                errorDiv.style.display = "block";
             }
         }
 
@@ -450,145 +685,443 @@
             localStorage.removeItem("gym_logged_in");
             document.getElementById("app-screen").style.display = "none";
             document.getElementById("login-screen").style.display = "flex";
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
         }
 
         function showApp() {
             document.getElementById("login-screen").style.display = "none";
             document.getElementById("app-screen").style.display = "block";
             renderExercisesUI();
+            drawDualRings();
             renderNutritionUI();
         }
 
         function switchView(viewName) {
-            document.getElementById("view-home").style.display = viewName === 'home' ? "block" : "none";
-            document.getElementById("view-exercises").style.display = viewName === 'exercises' ? "block" : "none";
-            document.getElementById("view-nutrition").style.display = viewName === 'nutrition' ? "block" : "none";
+            const homeView = document.getElementById("view-home");
+            const nutritionView = document.getElementById("view-nutrition");
+            const exercisesView = document.getElementById("view-exercises");
             
-            document.getElementById("btn-home").className = viewName === 'home' ? "active" : "";
-            document.getElementById("btn-exercises").className = viewName === 'exercises' ? "active" : "";
-            document.getElementById("btn-nutrition").className = viewName === 'nutrition' ? "active" : "";
+            const btnHome = document.getElementById("btn-home");
+            const btnNutrition = document.getElementById("btn-nutrition");
+            const btnExercises = document.getElementById("btn-exercises");
 
-            if (viewName === 'exercises') setTimeout(() => { renderExercisesUI(); initExerciseChart(); }, 100);
-            if (viewName === 'nutrition') renderNutritionUI();
+            homeView.style.display = "none";
+            nutritionView.style.display = "none";
+            exercisesView.style.display = "none";
+            btnHome.classList.remove("active");
+            btnNutrition.classList.remove("active");
+            btnExercises.classList.remove("active");
+
+            if (viewName === 'home') {
+                homeView.style.display = "block";
+                btnHome.classList.add("active");
+                drawDualRings();
+            } else if (viewName === 'nutrition') {
+                nutritionView.style.display = "block";
+                btnNutrition.classList.add("active");
+                renderNutritionUI();
+            } else {
+                exercisesView.style.display = "block";
+                btnExercises.classList.add("active");
+                setTimeout(() => {
+                    renderExercisesUI();
+                    initCharts();
+                }, 100);
+            }
         }
 
-        function loadDateAndRoutine() {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const now = new Date();
-            document.getElementById("current-date").innerText = now.toLocaleDateString('es-ES', options);
-            
-            const dayOfWeek = now.getDay(); // 0 = Domingo, 1 = Lunes...
-            
-            const routine = routinesConfig[dayOfWeek];
-            document.getElementById("routine-day-name").innerText = routine.name;
-            document.getElementById("today-routine").innerText = routine.detail;
+        // --- SISTEMA DE ANILLOS CONCÉNTRICOS (APPLE STYLE) ---
+        function drawDualRings() {
+            const canvas = document.getElementById("dualRingsCanvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            const x = canvas.width / 2;
+            const y = canvas.height / 2;
 
-            document.getElementById("today-meal").innerText = mealsConfig[dayOfWeek];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Anillo Exterior Rosa (Pasos - Apple Health) - Radio 68
+            const radiusOuter = 68;
+            const lineWidth = 10;
+
+            // Raíl vacío rosa
+            ctx.beginPath();
+            ctx.arc(x, y, radiusOuter, 0, 2 * Math.PI);
+            ctx.lineWidth = lineWidth;
+            ctx.strokeStyle = "rgba(255, 45, 85, 0.2)";
+            ctx.stroke();
+
+            // Progreso pasos
+            let stepProg = dailySteps / targetSteps;
+            if (stepProg > 1) stepProg = 1;
+            if (dailySteps > 0 && stepProg < 0.05) stepProg = 0.05;
+
+            ctx.beginPath();
+            ctx.arc(x, y, radiusOuter, -0.5 * Math.PI, -0.5 * Math.PI + (2 * Math.PI * stepProg));
+            ctx.lineWidth = lineWidth;
+            ctx.strokeStyle = "var(--accent-pink)";
+            ctx.lineCap = "round";
+            ctx.stroke();
+
+            // 2. Anillo Interior Azul (Calorías) - Radio 53
+            const radiusInner = 53;
+
+            // Raíl vacío azul
+            ctx.beginPath();
+            ctx.arc(x, y, radiusInner, 0, 2 * Math.PI);
+            ctx.lineWidth = lineWidth;
+            ctx.strokeStyle = "rgba(0, 210, 255, 0.2)";
+            ctx.stroke();
+
+            // Progreso calorías
+            let calProg = dailyCalories / targetCalories;
+            if (calProg > 1) calProg = 1;
+            if (dailyCalories > 0 && calProg < 0.05) calProg = 0.05;
+
+            ctx.beginPath();
+            ctx.arc(x, y, radiusInner, -0.5 * Math.PI, -0.5 * Math.PI + (2 * Math.PI * calProg));
+            ctx.lineWidth = lineWidth;
+            ctx.strokeStyle = "var(--nutrition-color)";
+            ctx.lineCap = "round";
+            ctx.stroke();
+
+            // Actualizar textos centrales
+            document.getElementById("calories-ring-text").innerText = `${dailyCalories} / ${targetCalories} kcal`;
+            document.getElementById("steps-ring-text").innerText = `${dailySteps.toLocaleString()} pasos`;
         }
 
-        // Sistema de Anillos Concéntricos (Punto 2)
-        function updateRings() {
-            const kcalGoal = 2500;
-            const stepsGoal = 10000;
-
-            // Anillo Azul (Calorías) - Radio 45, Perímetro ~282.7
-            const ringCal = document.getElementById("ring-calories");
-            const calOffset = 282.7 - (Math.min(dailyCalories, kcalGoal) / kcalGoal) * 282.7;
-            ringCal.style.strokeDashoffset = calOffset;
-            document.getElementById("txt-kcal-ingeridas").innerText = `${dailyCalories} / ${kcalGoal} kcal`;
-
-            // Anillo Rosa (Pasos Apple Health) - Radio 65, Perímetro ~408.4
-            const ringStep = document.getElementById("ring-steps");
-            const stepsOffset = 408.4 - (Math.min(dailySteps, stepsGoal) / stepsGoal) * 408.4;
-            ringStep.style.strokeDashoffset = stepsOffset;
-            document.getElementById("txt-steps-health").innerText = `${dailySteps.toLocaleString()} / 10K pasos`;
-        }
-
-        function getFormattedShortDate() {
-            return new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
-        }
-
-        // --- MÓDULO DE PETICIONES N8N + GEMINI (Puntos 1 y 2) ---
-        function sendDataToN8n() {
-            const text = document.getElementById("ai-input").value;
+        // --- INTEGRACIÓN GEMINI + N8N PARA COMIDAS ---
+        function sendMealToGeminiN8n() {
+            const textInput = document.getElementById("ai-nutrition-text").value.trim();
             const imageFile = document.getElementById("ai-image").files[0];
-            
-            if(!text && !imageFile) {
-                alert("Por favor escribe un mensaje o selecciona una imagen.");
+
+            if (!imageFile) {
+                alert("Por favor, selecciona o haz una foto a tu plato de comida.");
                 return;
             }
 
-            // Si hay imagen, la convertimos a Base64 antes de mandarla a tu webhook
-            if (imageFile) {
-                const reader = new FileReader();
-                reader.readAsDataURL(imageFile);
-                reader.onload = function () {
-                    executeFetchToN8n(text, reader.result);
-                };
-            } else {
-                executeFetchToN8n(text, null);
-            }
+            const reader = new FileReader();
+            reader.readAsDataURL(imageFile);
+            reader.onload = function () {
+                const base64String = reader.result.split(',')[1];
+                executeFetchToN8n(textInput, base64String);
+            };
+            reader.onerror = function (error) {
+                console.error("Error al leer la imagen:", error);
+                alert("Error al procesar el archivo de imagen.");
+            };
         }
 
         function executeFetchToN8n(promptText, imageBase64) {
-            // AQUÍ COLOCARÁS TU URL DE WEBHOOK DE N8N CUANDO LA TENGAS
-            const N8N_WEBHOOK_URL = "https://tu-servidor-n8n.com/webhook/gym-assistant";
+            const N8N_WEBHOOK_URL = "https://tu-servidor-n8n.com/webhook/gym-assistant"; // Reemplaza con tu webhook
 
-            alert("Enviando comando a n8n para análisis con Gemini...");
+            const statusText = document.getElementById('image-status');
+            statusText.innerText = "⏳ Gemini analizando tu plato...";
+            statusText.style.color = "var(--nutrition-color)";
+            statusText.style.display = "block";
 
-            // Payload preparado para mandar el texto y la imagen estructurada a n8n
             const payload = {
                 usuario: "alex",
                 mensaje: promptText,
-                imagen: imageBase64, // Viaja en formato de cadena Base64
+                imagen: imageBase64,
                 fecha: new Date().toISOString()
             };
 
-            console.log("Payload para n8n:", payload);
-
-            /* 
-            // Descomenta este bloque cuando configures tu webhook en n8n:
             fetch(N8N_WEBHOOK_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error("Error en servidor n8n");
+                return res.json();
+            })
             .then(data => {
-                // Suponiendo que n8n procesa la foto con Gemini y te devuelve las calorías deducidas:
-                if(data.caloriasDeducidas) {
-                    dailyCalories += parseInt(data.caloriasDeducidas);
+                if (data && data.caloriasDeducidas) {
+                    const kcal = parseInt(data.caloriasDeducidas);
+                    dailyCalories += kcal;
                     localStorage.setItem("gym_calories_count", dailyCalories);
-                    updateRings();
-                    alert(`¡Gemini analizó tu plato! +${data.caloriasDeducidas} kcal añadidas.`);
+                    drawDualRings();
+
+                    const descripcion = data.analisis || promptText || "Plato analizado con IA";
+                    mealsData.push({ 
+                        type: "IA 🤖", 
+                        name: `${descripcion} (P:${data.proteinas || 0}g, C:${data.carbohidratos || 0}g)`, 
+                        kcal: kcal 
+                    });
+                    localStorage.setItem("gym_meals_today", JSON.stringify(mealsData));
+                    renderNutritionUI();
+
+                    document.getElementById("ai-nutrition-text").value = "";
+                    document.getElementById("ai-image").value = "";
+                    statusText.style.display = "none";
+
+                    alert(`🤖 ¡Gemini procesó tu plato!\n\n🔥 +${kcal} kcal\n🍗 Proteínas: ${data.proteinas || 0}g\n🍚 Carbos: ${data.carbohidratos || 0}g`);
+                } else {
+                    alert("La IA respondió pero faltaban datos calóricos.");
+                    statusText.style.display = "none";
                 }
-            }).catch(err => console.error("Error al conectar con n8n:", err));
-            */
+            })
+            .catch(err => {
+                console.warn("Fallo de conexión con n8n, aplicando simulación local de prueba:", err);
+                
+                // Simulación local útil para pruebas antes de configurar el servidor
+                const kcalSimuladas = 480;
+                dailyCalories += kcalSimuladas;
+                localStorage.setItem("gym_calories_count", dailyCalories);
+                
+                mealsData.push({ 
+                    type: "IA (Simulación) 🤖", 
+                    name: (promptText || "Plato subido") + " (P:30g, C:45g)", 
+                    kcal: kcalSimuladas 
+                });
+                localStorage.setItem("gym_meals_today", JSON.stringify(mealsData));
+                
+                drawDualRings();
+                renderNutritionUI();
+                
+                document.getElementById("ai-nutrition-text").value = "";
+                document.getElementById("ai-image").value = "";
+                statusText.style.display = "none";
+                
+                alert("⚠️ Modo de Prueba (n8n no conectado):\nSe han sumado +480 kcal al anillo azul e historial.");
+            });
         }
 
-        // --- SECCIÓN: EJERCICIOS ---
+        function addManualMeal() {
+            const type = document.getElementById("manual-meal-type").value;
+            const name = document.getElementById("manual-meal-name").value.trim();
+            const kcal = parseInt(document.getElementById("manual-meal-kcal").value);
+
+            if (!name || isNaN(kcal)) {
+                alert("Introduce un nombre y un valor calórico válido.");
+                return;
+            }
+
+            dailyCalories += kcal;
+            localStorage.setItem("gym_calories_count", dailyCalories);
+
+            mealsData.push({ type: type, name: name, kcal: kcal });
+            localStorage.setItem("gym_meals_today", JSON.stringify(mealsData));
+
+            document.getElementById("manual-meal-name").value = "";
+            document.getElementById("manual-meal-kcal").value = "";
+
+            drawDualRings();
+            renderNutritionUI();
+        }
+
+        function renderNutritionUI() {
+            const container = document.getElementById("meals-list-container");
+            container.innerHTML = "";
+            
+            if (mealsData.length === 0) {
+                container.innerHTML = `<p style="font-size: 13px; color: var(--text-secondary); text-align: center; padding: 10px 0;">No hay comidas registradas hoy.</p>`;
+                return;
+            }
+
+            mealsData.forEach(meal => {
+                const item = document.createElement("div");
+                item.className = "meal-item";
+                item.innerHTML = `
+                    <div class="meal-info">
+                        <h4>${meal.name}</h4>
+                        <p>${meal.type}</p>
+                    </div>
+                    <div class="meal-kcal">+${meal.kcal} kcal</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // --- GESTIÓN DE FECHAS, RUTINAS Y CALENDARIO ---
+        function loadDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date().toLocaleDateString('es-ES', options);
+            document.getElementById("current-date").innerText = today;
+        }
+
+        function loadRoutineAndMeal() {
+            const dayIndex = new Date().getDay(); // 0 = Domingo, 1 = Lunes...
+            
+            const routineObj = weekRoutines[dayIndex] || weekRoutines[0];
+            document.getElementById("routine-title-day").innerText = routineObj.name;
+            document.getElementById("today-routine").innerText = routineObj.details;
+
+            const mealPlanText = weekMealsPlan[dayIndex] || weekMealsPlan[0];
+            document.getElementById("today-meal").innerText = mealPlanText;
+        }
+
+        function getGymKey(d = new Date()) {
+            return `gym_attendance_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
+        }
+
+        function checkTodayGym() {
+            const checkbox = document.getElementById("gym-check");
+            const statusText = document.getElementById("gym-status-text");
+            const isCompleted = localStorage.getItem(getGymKey()) === "true";
+
+            checkbox.checked = isCompleted;
+            if (isCompleted) {
+                statusText.innerText = "¡Entrenado! 🚀";
+                statusText.style.color = "var(--success-color)";
+            } else {
+                statusText.innerText = "Falta / Descanso";
+                statusText.style.color = "var(--text-secondary)";
+            }
+        }
+
+        function toggleGymAttendance() {
+            const checkbox = document.getElementById("gym-check");
+            const statusText = document.getElementById("gym-status-text");
+            
+            if (checkbox.checked) {
+                localStorage.setItem(getGymKey(), "true");
+                statusText.innerText = "¡Entrenado! 🚀";
+                statusText.style.color = "var(--success-color)";
+            } else {
+                localStorage.removeItem(getGymKey());
+                statusText.innerText = "Falta / Descanso";
+                statusText.style.color = "var(--text-secondary)";
+            }
+            loadWeekCalendar();
+        }
+
+        function loadWeekCalendar() {
+            const container = document.getElementById("week-container");
+            container.innerHTML = "";
+
+            const now = new Date();
+            const dayOfWeek = now.getDay();
+            const distanceToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            
+            const monday = new Date(now);
+            monday.setDate(now.getDate() + distanceToMonday);
+
+            const dayNames = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+
+            for (let i = 0; i < 7; i++) {
+                const currentDay = new Date(monday);
+                currentDay.setDate(monday.getDate() + i);
+
+                const div = document.createElement("div");
+                div.className = "week-day";
+                
+                const dayNum = currentDay.getDate();
+                const isToday = currentDay.toDateString() === now.toDateString();
+
+                if (isToday) div.classList.add("today");
+
+                const key = getGymKey(currentDay);
+                if (localStorage.getItem(key) === "true") {
+                    div.classList.add("completed");
+                }
+
+                div.innerHTML = `<span>${dayNames[i]}</span>${dayNum}`;
+                container.appendChild(div);
+            }
+        }
+
+        function openCalendarModal() {
+            const modal = document.getElementById("calendar-modal");
+            modal.style.display = "flex";
+            
+            const now = new Date();
+            const year = now.getFullYear();
+            document.getElementById("modal-year-title").innerText = `Historial Gym (${year})`;
+
+            const container = document.getElementById("full-year-months-container");
+            container.innerHTML = "";
+
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            const daysOfWeekHeader = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+
+            for (let m = 0; m < 12; m++) {
+                const monthCard = document.createElement("div");
+                monthCard.className = "month-card";
+
+                const title = document.createElement("div");
+                title.className = "month-title";
+                title.innerText = monthNames[m];
+                monthCard.appendChild(title);
+
+                const grid = document.createElement("div");
+                grid.className = "month-grid";
+
+                daysOfWeekHeader.forEach(dName => {
+                    const dHeader = document.createElement("div");
+                    dHeader.className = "month-day-name";
+                    dHeader.innerText = dName;
+                    grid.appendChild(dHeader);
+                });
+
+                const firstDayIndex = (new Date(year, m, 1).getDay() + 6) % 7;
+                const totalDays = new Date(year, m + 1, 0).getDate();
+
+                for (let i = 0; i < firstDayIndex; i++) {
+                    grid.appendChild(document.createElement("div"));
+                }
+
+                for (let day = 1; day <= totalDays; day++) {
+                    const dayCell = document.createElement("div");
+                    dayCell.className = "month-day";
+                    dayCell.innerText = day;
+
+                    const dateObj = new Date(year, m, day);
+                    if (localStorage.getItem(getGymKey(dateObj)) === "true") {
+                        dayCell.classList.add("completed");
+                    }
+                    grid.appendChild(dayCell);
+                }
+
+                monthCard.appendChild(grid);
+                container.appendChild(monthCard);
+            }
+        }
+
+        function closeCalendarModal() {
+            document.getElementById("calendar-modal").style.display = "none";
+        }
+
+        // --- GESTIÓN DE EJERCICIOS Y GRÁFICAS ---
+        function getFormattedShortDate(d = new Date()) {
+            return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+        }
+
         function renderExercisesUI() {
             const listContainer = document.getElementById("exercises-list-container");
             const selectContainer = document.getElementById("exercise-select");
-            listContainer.innerHTML = ""; selectContainer.innerHTML = "";
+            
+            listContainer.innerHTML = "";
+            selectContainer.innerHTML = "";
 
             if (exercisesData.length === 0) {
-                listContainer.innerHTML = `<p style="font-size: 13px; color: var(--text-secondary);">No hay ejercicios añadidos.</p>`;
+                listContainer.innerHTML = `<p style="font-size: 13px; color: var(--text-secondary);">No hay ejercicios creados aún.</p>`;
+                const option = document.createElement("option");
+                option.innerText = "Sin ejercicios";
+                selectContainer.appendChild(option);
                 return;
             }
 
             exercisesData.forEach((ex, index) => {
                 const item = document.createElement("div");
-                item.className = "item-row";
+                item.className = "exercise-item";
                 item.innerHTML = `
-                    <div><strong>${ex.name}</strong> <span style="color:var(--text-secondary); font-size:12px;">(${ex.details})</span></div>
-                    <div><span class="delete-btn" style="background:var(--accent-color); color:#fff; padding:4px 8px; border-radius:6px; font-size:12px; margin-right:10px;">${ex.weight} kg</span>
-                    <button class="delete-btn" onclick="deleteExercise(${index})">🗑️</button></div>
+                    <div class="exercise-info">
+                        <h3>${ex.name}</h3>
+                        <p>${ex.details}</p>
+                    </div>
+                    <div class="exercise-actions">
+                        <div class="weight-badge">${ex.weight} kg</div>
+                        <button class="delete-btn" onclick="deleteExercise(${index})">🗑️</button>
+                    </div>
                 `;
                 listContainer.appendChild(item);
 
                 const option = document.createElement("option");
-                option.value = index; option.innerText = ex.name;
+                option.value = index;
+                option.innerText = ex.name;
                 selectContainer.appendChild(option);
             });
         }
@@ -598,25 +1131,44 @@
             const details = document.getElementById("new-ex-details").value.trim();
             const weight = parseFloat(document.getElementById("new-ex-weight").value);
 
-            if (!name || isNaN(weight)) return alert("Rellena nombre y peso.");
+            if (!name || isNaN(weight)) {
+                alert("Por favor rellena al menos el nombre y el peso.");
+                return;
+            }
+
+            const todayFormatted = getFormattedShortDate();
 
             exercisesData.push({
-                name: name, details: details || "3x10", weight: weight,
-                dates: [getFormattedShortDate()], history: [weight]
+                id: Date.now(),
+                name: name,
+                details: details || "3 series x 10 reps",
+                weight: weight,
+                dates: [todayFormatted],
+                history: [weight]
             });
 
             localStorage.setItem("gym_exercises", JSON.stringify(exercisesData));
+            
             document.getElementById("new-ex-name").value = "";
+            document.getElementById("new-ex-details").value = "";
             document.getElementById("new-ex-weight").value = "";
+
             renderExercisesUI();
-            initExerciseChart();
+            initCharts();
         }
 
         function deleteExercise(index) {
-            exercisesData.splice(index, 1);
-            localStorage.setItem("gym_exercises", JSON.stringify(exercisesData));
-            renderExercisesUI();
+            if (confirm("¿Seguro que quieres borrar este ejercicio?")) {
+                exercisesData.splice(index, 1);
+                localStorage.setItem("gym_exercises", JSON.stringify(exercisesData));
+                renderExercisesUI();
+                initCharts();
+            }
+        }
+
+        function initCharts() {
             initExerciseChart();
+            initBodyWeightChart();
         }
 
         function initExerciseChart() {
@@ -625,109 +1177,90 @@
             const currentEx = exercisesData[selectedIndex];
 
             if (exChart) exChart.destroy();
-            if (!currentEx) return;
 
             exChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: currentEx.dates,
+                    labels: currentEx && currentEx.dates ? currentEx.dates : [],
                     datasets: [{
-                        label: `${currentEx.name} (kg)`,
-                        data: currentEx.history,
+                        label: currentEx ? `${currentEx.name} (kg)` : 'Sin datos',
+                        data: currentEx && currentEx.history ? currentEx.history : [],
                         borderColor: '#0a84ff',
+                        backgroundColor: 'rgba(10, 132, 255, 0.1)',
                         borderWidth: 3,
-                        tension: 0.3,
-                        fill: false
+                        fill: true,
+                        tension: 0.3
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        x: { ticks: { color: '#8e8e93' }, grid: { color: '#2c2c2e' } },
+                        y: { ticks: { color: '#8e8e93' }, grid: { color: '#2c2c2e' } }
+                    }
+                }
             });
         }
-        function updateExerciseChart() { initExerciseChart(); }
 
-        // --- SECCIÓN: ALIMENTACIÓN Y LISTA DE LA COMPRA (Punto 4) ---
-        function renderNutritionUI() {
-            // 1. Render Comidas Manuales
-            const mealsContainer = document.getElementById("meals-list-container");
-            mealsContainer.innerHTML = "";
-            if(mealsData.length === 0) {
-                mealsContainer.innerHTML = `<p style="font-size: 13px; color: var(--text-secondary);">No has registrado comidas manuales hoy.</p>`;
-            } else {
-                mealsData.forEach((m, idx) => {
-                    const row = document.createElement("div");
-                    row.className = "item-row";
-                    row.innerHTML = `
-                        <div><span style="color:var(--accent-color); font-weight:700;">[${m.type}]</span> ${m.name}</div>
-                        <div><span style="font-size:13px; margin-right:8px;">${m.kcal} kcal</span><button class="delete-btn" onclick="deleteMeal(${idx})">🗑️</button></div>
-                    `;
-                    mealsContainer.appendChild(row);
-                });
+        function updateExerciseChart() {
+            initExerciseChart();
+        }
+
+        function initBodyWeightChart() {
+            const ctx = document.getElementById('bodyWeightChart').getContext('2d');
+            
+            if (bwChart) bwChart.destroy();
+
+            bwChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: bodyWeightData.dates,
+                    datasets: [{
+                        label: 'Peso Corporal (kg)',
+                        data: bodyWeightData.data,
+                        borderColor: '#30d158',
+                        backgroundColor: 'rgba(48, 209, 88, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        x: { ticks: { color: '#8e8e93' }, grid: { color: '#2c2c2e' } },
+                        y: { ticks: { color: '#8e8e93' }, grid: { color: '#2c2c2e' } }
+                    }
+                }
+            });
+        }
+
+        function addBodyWeight() {
+            const val = parseFloat(document.getElementById("new-body-weight").value);
+            if (isNaN(val)) {
+                alert("Introduce un peso válido.");
+                return;
             }
 
-            // 2. Render Lista de la Compra
-            const shopContainer = document.getElementById("shopping-list-container");
-            shopContainer.innerHTML = "";
-            shoppingList.forEach((item, idx) => {
-                const row = document.createElement("div");
-                row.className = "item-row";
-                row.innerHTML = `
-                    <div>🍏 <strong>${item.name}</strong></div>
-                    <div><span style="color:var(--text-secondary); font-size:13px; margin-right:10px;">${item.weight}</span><button class="delete-btn" onclick="deleteShoppingItem(${idx})">🗑️</button></div>
-                `;
-                shopContainer.appendChild(row);
-            });
+            bodyWeightData.dates.push(getFormattedShortDate());
+            bodyWeightData.data.push(val);
+
+            localStorage.setItem("gym_body_weight", JSON.stringify(bodyWeightData));
+            document.getElementById("new-body-weight").value = "";
+            initBodyWeightChart();
         }
 
-        function addManualMeal() {
-            const type = document.getElementById("new-meal-type").value;
-            const name = document.getElementById("new-meal-name").value.trim();
-            const kcal = parseInt(document.getElementById("new-body-kcal").value);
-
-            if(!name || isNaN(kcal)) return alert("Introduce descripción y calorías válidas.");
-
-            mealsData.push({ type, name, kcal });
-            dailyCalories += kcal;
-
-            localStorage.setItem("gym_meals_today", JSON.stringify(mealsData));
-            localStorage.setItem("gym_calories_count", dailyCalories);
-            
-            document.getElementById("new-meal-name").value = "";
-            document.getElementById("new-body-kcal").value = "";
-            
-            renderNutritionUI();
-            updateRings();
-        }
-
-        function deleteMeal(idx) {
-            dailyCalories -= mealsData[idx].kcal;
-            if(dailyCalories < 0) dailyCalories = 0;
-            mealsData.splice(idx, 1);
-
-            localStorage.setItem("gym_meals_today", JSON.stringify(mealsData));
-            localStorage.setItem("gym_calories_count", dailyCalories);
-            
-            renderNutritionUI();
-            updateRings();
-        }
-
-        function addShoppingItem() {
-            const name = document.getElementById("shop-item-name").value.trim();
-            const weight = document.getElementById("shop-item-weight").value.trim();
-
-            if(!name || !weight) return alert("Rellena el alimento y su peso/cantidad.");
-
-            shoppingList.push({ name, weight });
-            localStorage.setItem("gym_shopping", JSON.stringify(shoppingList));
-
-            document.getElementById("shop-item-name").value = "";
-            document.getElementById("shop-item-weight").value = "";
-            renderNutritionUI();
-        }
-
-        function deleteShoppingItem(idx) {
-            shoppingList.splice(idx, 1);
-            localStorage.setItem("gym_shopping", JSON.stringify(shoppingList));
-            renderNutritionUI();
+        function sendDataToN8n() {
+            const text = document.getElementById("ai-input").value;
+            if(!text) {
+                alert("Escribe algo de tu entreno primero.");
+                return;
+            }
+            alert("Texto listo para n8n:\n\n" + text);
         }
     </script>
 </body>
