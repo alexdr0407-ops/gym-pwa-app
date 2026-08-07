@@ -495,9 +495,7 @@
                 <span id="apple-modal-title">Aviso</span>
                 <div class="apple-alert-sub" id="apple-modal-desc">¿Deseas confirmar esta acción?</div>
             </div>
-            <div class="apple-alert-buttons" id="apple-modal-buttons">
-                <!-- Se inyectan dinámicamente según sea confirmación o alerta simple -->
-            </div>
+            <div class="apple-alert-buttons" id="apple-modal-buttons"></div>
         </div>
     </div>
 
@@ -541,10 +539,9 @@
             <button id="btn-exercises" onclick="switchView('exercises')">📈 Ejercicios</button>
         </div>
 
-        <!-- VISTA 1: INICIO (HOME) - Ahora incluye analizador IA Gemini -->
+        <!-- VISTA 1: INICIO (HOME) -->
         <div id="view-home" class="view-section" style="display: block;">
             
-            <!-- Dashboard de Anillos Concéntricos (Apple Style) -->
             <div class="card rings-box">
                 <div class="rings-wrapper">
                     <canvas id="dualRingsCanvas" width="160" height="160"></canvas>
@@ -559,7 +556,6 @@
                 </div>
             </div>
 
-            <!-- Dashboard: Asistencia al Gym -->
             <div class="card gym-box">
                 <div>
                     <h2>Asistencia al Gym</h2>
@@ -571,11 +567,9 @@
                 </label>
             </div>
 
-            <!-- ANALIZADOR GEMINI (Movido al HOME como pediste) -->
             <div class="card">
                 <h2>🤖 Analizador Gemini (IA)</h2>
                 <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Haz una foto a tu comida y mándala a Gemini:</p>
-                
                 <div style="background-color: #1c1c1e;">
                     <input type="file" id="ai-image" accept="image/*" style="padding: 8px 0; background: transparent; border: none; margin-bottom: 8px;">
                     <textarea id="ai-nutrition-text" placeholder="Ej: Comida de pollo con arroz..." style="height:60px; resize:none; margin-bottom:10px;"></textarea>
@@ -584,20 +578,17 @@
                 </div>
             </div>
 
-            <!-- Dashboard: Rutina de hoy (Filtra los ejercicios según el día asignado) -->
             <div class="card">
                 <h2>📅 Rutina de Hoy: <span id="routine-title-day" style="color: var(--accent-color);"></span></h2>
                 <p id="today-routine" style="margin-bottom: 12px;"></p>
                 <div id="today-assigned-exercises"></div>
             </div>
 
-            <!-- Dashboard: Comida asignada del día -->
             <div class="card">
                 <h2>🍽️ Plan Nutricional de Hoy</h2>
                 <p id="today-meal">Cargando menú asignado...</p>
             </div>
 
-            <!-- Mini Calendario Semanal -->
             <div class="card" style="cursor: pointer;" onclick="openCalendarModal()">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h2>📊 Constancia Semanal</h2>
@@ -607,7 +598,6 @@
                 <div class="week-grid" id="week-container"></div>
             </div>
 
-            <!-- Entrada de texto plano para n8n de entreno -->
             <div class="card">
                 <h2>🎙️ Registrar Entreno con Texto</h2>
                 <div class="input-section">
@@ -617,20 +607,44 @@
             </div>
         </div>
 
-        <!-- VISTA 2: ALIMENTACIÓN Y LISTA DE LA COMPRA -->
+        <!-- VISTA 2: ALIMENTACIÓN Y LISTA DE LA COMPRA (Modificada) -->
         <div id="view-nutrition" class="view-section">
-            <!-- Registro manual de Comida, Cena o Desayuno -->
+            
+            <!-- Selector de Comidas Creadas -->
             <div class="card">
-                <h2>➕ Añadir Comida Manualmente</h2>
-                <select id="manual-meal-type">
-                    <option value="Desayuno">Desayuno</option>
-                    <option value="Comida">Comida</option>
-                    <option value="Cena">Cena</option>
-                    <option value="Snack / Extra">Snack / Extra</option>
+                <h2>🍽️ Seleccionar de la Lista de Comidas</h2>
+                <select id="food-category-select" onchange="updateFoodOptionsDropdown()">
+                    <option value="desayuno">Desayunos</option>
+                    <option value="comida">Comidas</option>
+                    <option value="cena">Cenas</option>
+                    <option value="snack">Snacks / Extras</option>
                 </select>
-                <input type="text" id="manual-meal-name" placeholder="Nombre del alimento o plato">
-                <input type="number" id="manual-meal-kcal" placeholder="Calorías (kcal)">
-                <button onclick="addManualMeal()">Guardar en el Anillo</button>
+
+                <select id="food-item-select">
+                    <!-- Rellenado dinámicamente -->
+                </select>
+
+                <select id="nutrition-action-type">
+                    <option value="anillo">Añadir al Anillo de Calorías</option>
+                    <option value="lista">Añadir a la Lista de la Compra</option>
+                    <option value="ambos">Ambos (Anillo y Lista)</option>
+                </select>
+
+                <button onclick="processSelectedFoodAction()">Añadir Elección</button>
+            </div>
+
+            <!-- Creador de Nuevas Comidas / Desayunos / Cenas -->
+            <div class="card">
+                <h2>➕ Crear Nuevo Alimento / Plato</h2>
+                <select id="new-food-category">
+                    <option value="desayuno">Desayunos</option>
+                    <option value="comida">Comidas</option>
+                    <option value="cena">Cenas</option>
+                    <option value="snack">Snacks / Extras</option>
+                </select>
+                <input type="text" id="new-food-name" placeholder="Nombre (ej: Tortitas de avena)">
+                <input type="number" id="new-food-kcal" placeholder="Calorías aproximadas (kcal)">
+                <button onclick="addNewFoodToDatabase()" style="background-color: var(--success-color); color: #000;">Guardar en mi Lista de Comidas</button>
             </div>
 
             <!-- Historial de platos del día -->
@@ -642,19 +656,15 @@
             <!-- Lista de la Compra -->
             <div class="card">
                 <h2>🛒 Lista de la Compra</h2>
-                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;">Alimentos y pesos necesarios para tu semana:</p>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;">Alimentos necesarios añadidos:</p>
                 <div id="shopping-list-container">
                     <div class="shopping-row"><span>Pechuga de Pollo</span><b>2.5 kg</b></div>
                     <div class="shopping-row"><span>Arroz Blanco</span><b>1.5 kg</b></div>
-                    <div class="shopping-row"><span>Huevos camperos</span><b>2 docenas</b></div>
-                    <div class="shopping-row"><span>Salmón fresco</span><b>600 g</b></div>
-                    <div class="shopping-row"><span>Avena en copos</span><b>1 kg</b></div>
-                    <div class="shopping-row"><span>Aguacates</span><b>4 unidades</b></div>
                 </div>
             </div>
         </div>
 
-        <!-- VISTA 3: EJERCICIOS Y EVOLUCIÓN (Con selector de día para cada ejercicio) -->
+        <!-- VISTA 3: EJERCICIOS Y EVOLUCIÓN -->
         <div id="view-exercises" class="view-section">
             <div class="card">
                 <h2>🏋️‍♂️ Mis Ejercicios</h2>
@@ -714,6 +724,32 @@
         let targetSteps = 10000;
         let mealsData = JSON.parse(localStorage.getItem("gym_meals_today")) || [];
 
+        // Base de datos de comidas creadas por categorías
+        let foodDatabase = JSON.parse(localStorage.getItem("gym_food_database")) || {
+            desayuno: [
+                { name: "Avena con proteína y plátano", kcal: 350 },
+                { name: "Tostadas de aguacate y huevo", kcal: 400 }
+            ],
+            comida: [
+                { name: "Arroz con pechuga de pollo y aceite", kcal: 600 },
+                { name: "Pasta integral con ternera", kcal: 650 }
+            ],
+            cena: [
+                { name: "Salmón al horno con verduras", kcal: 500 },
+                { name: "Tortilla francesa de claras y atún", kcal: 300 }
+            ],
+            snack: [
+                { name: "Yogur griego con frutos rojos", kcal: 180 },
+                { name: "Puñado de frutos secos", kcal: 200 }
+            ]
+        };
+
+        // Lista de la compra persistente
+        let shoppingListData = JSON.parse(localStorage.getItem("gym_shopping_list")) || [
+            { name: "Pechuga de Pollo", qty: "2.5 kg" },
+            { name: "Arroz Blanco", qty: "1.5 kg" }
+        ];
+
         let exChart = null;
         let bwChart = null;
 
@@ -739,7 +775,6 @@
             0: "Desayuno: Libre moderado. / Comida: Comida familiar libre controlada. / Cena: Ligera de verdura y pescado."
         };
 
-        // --- SISTEMA DE ALERTAS ESTILO APPLE (Nativo iOS Look) ---
         function showAppleAlert(title, desc, onConfirmText = "Aceptar", onConfirmCallback = null, isDestructive = false) {
             const modal = document.getElementById("apple-modal");
             document.getElementById("apple-modal-title").innerText = title;
@@ -749,7 +784,6 @@
             btnContainer.innerHTML = "";
 
             if (onConfirmCallback) {
-                // Es un diálogo de confirmación (dos botones: Cancelar y Aceptar)
                 const cancelBtn = document.createElement("button");
                 cancelBtn.className = "apple-alert-btn";
                 cancelBtn.innerText = "Cancelar";
@@ -766,7 +800,6 @@
                 btnContainer.appendChild(cancelBtn);
                 btnContainer.appendChild(confirmBtn);
             } else {
-                // Alerta simple (un botón)
                 const okBtn = document.createElement("button");
                 okBtn.className = "apple-alert-btn single";
                 okBtn.innerText = onConfirmText;
@@ -791,6 +824,8 @@
             loadRoutineAndMeal();
             drawDualRings();
             renderNutritionUI();
+            updateFoodOptionsDropdown();
+            renderShoppingListUI();
             renderTodayAssignedExercises();
 
             setTimeout(() => {
@@ -829,6 +864,8 @@
             renderExercisesUI();
             drawDualRings();
             renderNutritionUI();
+            updateFoodOptionsDropdown();
+            renderShoppingListUI();
             renderTodayAssignedExercises();
         }
 
@@ -857,6 +894,8 @@
                 nutritionView.style.display = "block";
                 btnNutrition.classList.add("active");
                 renderNutritionUI();
+                updateFoodOptionsDropdown();
+                renderShoppingListUI();
             } else {
                 exercisesView.style.display = "block";
                 btnExercises.classList.add("active");
@@ -867,7 +906,99 @@
             }
         }
 
-        // --- ANILLOS CONCÉNTRICOS APPLE STYLE ---
+        // --- GESTIÓN DE COMIDAS Y LISTA DE LA COMPRA ---
+        function updateFoodOptionsDropdown() {
+            const cat = document.getElementById("food-category-select").value;
+            const selectEl = document.getElementById("food-item-select");
+            selectEl.innerHTML = "";
+
+            const items = foodDatabase[cat] || [];
+            if (items.length === 0) {
+                const opt = document.createElement("option");
+                opt.text = "No hay elementos en esta categoría";
+                selectEl.appendChild(opt);
+                return;
+            }
+
+            items.forEach((food, idx) => {
+                const opt = document.createElement("option");
+                opt.value = idx;
+                opt.text = `${food.name} (${food.kcal} kcal)`;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        function addNewFoodToDatabase() {
+            const cat = document.getElementById("new-food-category").value;
+            const name = document.getElementById("new-food-name").value.trim();
+            const kcal = parseInt(document.getElementById("new-food-kcal").value);
+
+            if (!name || isNaN(kcal)) {
+                showAppleAlert("Datos incompletos", "Introduce un nombre y las calorías del plato.");
+                return;
+            }
+
+            foodDatabase[cat].push({ name: name, kcal: kcal });
+            localStorage.setItem("gym_food_database", JSON.stringify(foodDatabase));
+
+            document.getElementById("new-food-name").value = "";
+            document.getElementById("new-food-kcal").value = "";
+
+            updateFoodOptionsDropdown();
+            showAppleAlert("¡Añadido!", "Se ha guardado tu nueva receta/comida en la base de datos.");
+        }
+
+        function processSelectedFoodAction() {
+            const cat = document.getElementById("food-category-select").value;
+            const idx = document.getElementById("food-item-select").value;
+            const action = document.getElementById("nutrition-action-type").value;
+
+            const items = foodDatabase[cat];
+            if (!items || items.length === 0 || idx === "") {
+                showAppleAlert("Aviso", "Selecciona un alimento válido.");
+                return;
+            }
+
+            const selectedFood = items[idx];
+
+            // 1. Añadir al Anillo de Calorías
+            if (action === "anillo" || action === "ambos") {
+                dailyCalories += selectedFood.kcal;
+                localStorage.setItem("gym_calories_count", dailyCalories);
+                mealsData.push({ type: cat.toUpperCase(), name: selectedFood.name, kcal: selectedFood.kcal });
+                localStorage.setItem("gym_meals_today", JSON.stringify(mealsData));
+                drawDualRings();
+                renderNutritionUI();
+            }
+
+            // 2. Añadir a la Lista de la Compra
+            if (action === "lista" || action === "ambos") {
+                shoppingListData.push({ name: selectedFood.name, qty: "1 porción" });
+                localStorage.setItem("gym_shopping_list", JSON.stringify(shoppingListData));
+                renderShoppingListUI();
+            }
+
+            showAppleAlert("Completado", `Acción realizada con éxito para: ${selectedFood.name}`);
+        }
+
+        function renderShoppingListUI() {
+            const container = document.getElementById("shopping-list-container");
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (shoppingListData.length === 0) {
+                container.innerHTML = `<p style="font-size: 13px; color: var(--text-secondary);">Lista vacía.</p>`;
+                return;
+            }
+
+            shoppingListData.forEach(item => {
+                const row = document.createElement("div");
+                row.className = "shopping-row";
+                row.innerHTML = `<span>${item.name}</span><b>${item.qty}</b>`;
+                container.appendChild(row);
+            });
+        }
+
         function drawDualRings() {
             const canvas = document.getElementById("dualRingsCanvas");
             if (!canvas) return;
@@ -920,7 +1051,6 @@
             document.getElementById("steps-ring-text").innerText = `${dailySteps.toLocaleString()} pasos`;
         }
 
-        // --- INTEGRACIÓN GEMINI + N8N (En Home) ---
         function sendMealToGeminiN8n() {
             const textInput = document.getElementById("ai-nutrition-text").value.trim();
             const imageFile = document.getElementById("ai-image").files[0];
@@ -936,14 +1066,10 @@
                 const base64String = reader.result.split(',')[1];
                 executeFetchToN8n(textInput, base64String);
             };
-            reader.onerror = function () {
-                showAppleAlert("Error", "Error al procesar el archivo de imagen.");
-            };
         }
 
         function executeFetchToN8n(promptText, imageBase64) {
             const N8N_WEBHOOK_URL = "https://tu-servidor-n8n.com/webhook/gym-assistant";
-
             const statusText = document.getElementById('image-status');
             statusText.innerText = "⏳ Gemini analizando tu plato...";
             statusText.style.color = "var(--nutrition-color)";
@@ -972,70 +1098,30 @@
                     localStorage.setItem("gym_calories_count", dailyCalories);
                     drawDualRings();
 
-                    const descripcion = data.analisis || promptText || "Plato analizado con IA";
-                    mealsData.push({ 
-                        type: "IA 🤖", 
-                        name: `${descripcion} (P:${data.proteinas || 0}g, C:${data.carbohidratos || 0}g)`, 
-                        kcal: kcal 
-                    });
+                    mealsData.push({ type: "IA 🤖", name: promptText || "Analizado por IA", kcal: kcal });
                     localStorage.setItem("gym_meals_today", JSON.stringify(mealsData));
                     renderNutritionUI();
 
                     document.getElementById("ai-nutrition-text").value = "";
                     document.getElementById("ai-image").value = "";
                     statusText.style.display = "none";
-
-                    showAppleAlert("¡Plato Analizado!", `🔥 +${kcal} kcal\n🍗 Proteínas: ${data.proteinas || 0}g\n🍚 Carbos: ${data.carbohidratos || 0}g`);
-                } else {
-                    statusText.style.display = "none";
-                    showAppleAlert("Aviso IA", "La respuesta de la IA no contenía calorías.");
+                    showAppleAlert("¡Plato Analizado!", `🔥 +${kcal} kcal`);
                 }
             })
             .catch(err => {
-                console.warn("Fallo n8n, simulación local aplicada:", err);
                 const kcalSimuladas = 480;
                 dailyCalories += kcalSimuladas;
                 localStorage.setItem("gym_calories_count", dailyCalories);
-                
-                mealsData.push({ 
-                    type: "IA (Simulación) 🤖", 
-                    name: (promptText || "Plato subido") + " (P:30g, C:45g)", 
-                    kcal: kcalSimuladas 
-                });
+                mealsData.push({ type: "IA (Simulación) 🤖", name: promptText || "Plato subido", kcal: kcalSimuladas });
                 localStorage.setItem("gym_meals_today", JSON.stringify(mealsData));
                 
                 drawDualRings();
                 renderNutritionUI();
-                
                 document.getElementById("ai-nutrition-text").value = "";
                 document.getElementById("ai-image").value = "";
                 statusText.style.display = "none";
-                
                 showAppleAlert("Modo Simulación", "Se han sumado +480 kcal al anillo azul.");
             });
-        }
-
-        function addManualMeal() {
-            const type = document.getElementById("manual-meal-type").value;
-            const name = document.getElementById("manual-meal-name").value.trim();
-            const kcal = parseInt(document.getElementById("manual-meal-kcal").value);
-
-            if (!name || isNaN(kcal)) {
-                showAppleAlert("Datos incompletos", "Introduce un nombre y un valor calórico válido.");
-                return;
-            }
-
-            dailyCalories += kcal;
-            localStorage.setItem("gym_calories_count", dailyCalories);
-
-            mealsData.push({ type: type, name: name, kcal: kcal });
-            localStorage.setItem("gym_meals_today", JSON.stringify(mealsData));
-
-            document.getElementById("manual-meal-name").value = "";
-            document.getElementById("manual-meal-kcal").value = "";
-
-            drawDualRings();
-            renderNutritionUI();
         }
 
         function renderNutritionUI() {
@@ -1062,7 +1148,6 @@
             });
         }
 
-        // --- GESTIÓN DE FECHAS Y RUTINAS ---
         function loadDate() {
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const today = new Date().toLocaleDateString('es-ES', options);
@@ -1071,16 +1156,12 @@
 
         function loadRoutineAndMeal() {
             const dayIndex = new Date().getDay();
-            
             const routineObj = weekRoutines[dayIndex] || weekRoutines[0];
             document.getElementById("routine-title-day").innerText = `${routineObj.name} (${dayNamesMap[dayIndex]})`;
             document.getElementById("today-routine").innerText = routineObj.details;
-
-            const mealPlanText = weekMealsPlan[dayIndex] || weekMealsPlan[0];
-            document.getElementById("today-meal").innerText = mealPlanText;
+            document.getElementById("today-meal").innerText = weekMealsPlan[dayIndex] || weekMealsPlan[0];
         }
 
-        // Renderiza en la pantalla principal SOLO los ejercicios asignados al día de hoy
         function renderTodayAssignedExercises() {
             const container = document.getElementById("today-assigned-exercises");
             if (!container) return;
@@ -1174,8 +1255,7 @@
 
                 if (isToday) div.classList.add("today");
 
-                const key = getGymKey(currentDay);
-                if (localStorage.getItem(key) === "true") {
+                if (localStorage.getItem(getGymKey(currentDay)) === "true") {
                     div.classList.add("completed");
                 }
 
@@ -1245,7 +1325,6 @@
             document.getElementById("calendar-modal").style.display = "none";
         }
 
-        // --- GESTIÓN DE EJERCICIOS Y GRÁFICAS ---
         function getFormattedShortDate(d = new Date()) {
             return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
         }
@@ -1382,7 +1461,6 @@
 
         function initBodyWeightChart() {
             const ctx = document.getElementById('bodyWeightChart').getContext('2d');
-            
             if (bwChart) bwChart.destroy();
 
             bwChart = new Chart(ctx, {
