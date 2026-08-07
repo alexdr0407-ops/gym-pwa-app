@@ -109,6 +109,84 @@
             font-weight: 600;
         }
 
+        /* Sistema de Alertas Tipo Prompt / Input estilo iOS */
+        #apple-prompt-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .apple-prompt-box {
+            background-color: #2c2c2e;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 280px;
+            text-align: center;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .apple-prompt-body {
+            padding: 20px 16px 10px 16px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #ffffff;
+            line-height: 1.3;
+        }
+
+        .apple-prompt-sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-weight: 400;
+            margin-bottom: 12px;
+        }
+
+        .apple-prompt-input {
+            width: calc(100% - 32px);
+            margin: 0 16px 15px 16px;
+            padding: 8px 10px;
+            background-color: #1c1c1e;
+            border: 1px solid #38383a;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        .apple-prompt-buttons {
+            display: flex;
+            border-top: 1px solid #38383a;
+        }
+
+        .apple-prompt-btn {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: var(--accent-color);
+            font-size: 17px;
+            font-weight: 400;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .apple-prompt-btn:active {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .apple-prompt-btn.confirm {
+            font-weight: 600;
+        }
+
         /* Pantallas generales */
         #login-screen {
             display: flex;
@@ -500,6 +578,21 @@
         </div>
     </div>
 
+    <!-- MODAL DE PROMPT ESTILO APPLE -->
+    <div id="apple-prompt-modal">
+        <div class="apple-prompt-box">
+            <div class="apple-prompt-body">
+                <span id="apple-prompt-title">Entrada</span>
+                <div class="apple-prompt-sub" id="apple-prompt-desc">Introduce el valor solicitado:</div>
+            </div>
+            <input type="text" id="apple-prompt-input-field" class="apple-prompt-input" autocomplete="off">
+            <div class="apple-prompt-buttons">
+                <button class="apple-prompt-btn" onclick="closeApplePrompt(false)">Cancelar</button>
+                <button class="apple-prompt-btn confirm" onclick="closeApplePrompt(true)">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- PANTALLA DE LOGIN -->
     <div id="login-screen">
         <div class="login-card">
@@ -722,7 +815,6 @@
         let targetSteps = 10000;
         let mealsData = JSON.parse(localStorage.getItem("gym_meals_today")) || [];
 
-        // Base de datos de comidas creadas por categorías
         let foodDatabase = JSON.parse(localStorage.getItem("gym_food_database")) || {
             desayuno: [
                 { name: "Avena con proteína y plátano", kcal: 350 },
@@ -742,7 +834,6 @@
             ]
         };
 
-        // Lista de la compra persistente
         let shoppingListData = JSON.parse(localStorage.getItem("gym_shopping_list")) || [
             { name: "Pechuga de Pollo", qty: "2.5 kg" },
             { name: "Arroz Blanco", qty: "1.5 kg" }
@@ -750,6 +841,7 @@
 
         let exChart = null;
         let bwChart = null;
+        let promptCallback = null;
 
         const dayNamesMap = { 0: "Domingo", 1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado" };
 
@@ -810,6 +902,30 @@
 
         function closeAppleModal() {
             document.getElementById("apple-modal").style.display = "none";
+        }
+
+        function showApplePrompt(title, desc, defaultValue, callback) {
+            const modal = document.getElementById("apple-prompt-modal");
+            document.getElementById("apple-prompt-title").innerText = title;
+            document.getElementById("apple-prompt-desc").innerText = desc;
+            
+            const inputField = document.getElementById("apple-prompt-input-field");
+            inputField.value = defaultValue;
+            
+            promptCallback = callback;
+            modal.style.display = "flex";
+            setTimeout(() => inputField.focus(), 100);
+        }
+
+        function closeApplePrompt(confirmed) {
+            const modal = document.getElementById("apple-prompt-modal");
+            const inputField = document.getElementById("apple-prompt-input-field");
+            modal.style.display = "none";
+            
+            if (confirmed && promptCallback) {
+                promptCallback(inputField.value);
+            }
+            promptCallback = null;
         }
 
         window.onload = function() {
@@ -904,7 +1020,6 @@
             }
         }
 
-        // --- GESTIÓN DE COMIDAS Y LISTA DE LA COMPRA ---
         function updateFoodOptionsDropdown() {
             const cat = document.getElementById("food-category-select").value;
             const selectEl = document.getElementById("food-item-select");
@@ -959,7 +1074,6 @@
 
             const selectedFood = items[idx];
 
-            // 1. Añadir al Anillo de Calorías si corresponde
             if (action === "anillo" || action === "ambos") {
                 dailyCalories += selectedFood.kcal;
                 localStorage.setItem("gym_calories_count", dailyCalories);
@@ -969,18 +1083,22 @@
                 renderNutritionUI();
             }
 
-            // 2. Añadir a la Lista de la Compra si corresponde (Preguntando cantidad)[cite: 2]
             if (action === "lista" || action === "ambos") {
-                let userQty = prompt(`¿Qué cantidad de "${selectedFood.name}" necesitas anotar en la lista de la compra?`, "1 kg");
-                if (userQty !== null) {
-                    userQty = userQty.trim() === "" ? "1 porción" : userQty.trim();
-                    shoppingListData.push({ name: selectedFood.name, qty: userQty });
-                    localStorage.setItem("gym_shopping_list", JSON.stringify(shoppingListData));
-                    renderShoppingListUI();
-                }
+                showApplePrompt(
+                    "Cantidad para la Compra", 
+                    `¿Qué cantidad de "${selectedFood.name}" necesitas anotar?`, 
+                    "1 kg", 
+                    (userQty) => {
+                        userQty = userQty && userQty.trim() !== "" ? userQty.trim() : "1 porción";
+                        shoppingListData.push({ name: selectedFood.name, qty: userQty });
+                        localStorage.setItem("gym_shopping_list", JSON.stringify(shoppingListData));
+                        renderShoppingListUI();
+                        showAppleAlert("Completado", `Acción realizada con éxito para: ${selectedFood.name}`);
+                    }
+                );
+            } else {
+                showAppleAlert("Completado", `Acción realizada con éxito para: ${selectedFood.name}`);
             }
-
-            showAppleAlert("Completado", `Acción realizada con éxito para: ${selectedFood.name}`);
         }
 
         function renderShoppingListUI() {
@@ -1025,7 +1143,6 @@
             const radiusOuter = 68;
             const lineWidth = 10;
 
-            // 1. ANILLO ROSA / ROJO (PASOS - Meta: 10,000)
             ctx.beginPath();
             ctx.arc(x, y, radiusOuter, 0, 2 * Math.PI);
             ctx.lineWidth = lineWidth;
@@ -1036,7 +1153,6 @@
             if (stepProg > 1) stepProg = 1;
             if (dailySteps > 0 && stepProg < 0.05) stepProg = 0.05;
 
-            // Cambio de color automático al llegar a 10,000 pasos
             let stepColor = dailySteps >= targetSteps ? "#ff69b4" : "var(--accent-pink)";
 
             ctx.beginPath();
@@ -1046,7 +1162,6 @@
             ctx.lineCap = "round";
             ctx.stroke();
 
-            // 2. ANILLO AZUL (CALORÍAS - Meta: 2500)
             const radiusInner = 53;
 
             ctx.beginPath();
@@ -1059,7 +1174,6 @@
             if (calProg > 1) calProg = 1;
             if (dailyCalories > 0 && calProg < 0.05) calProg = 0.05;
 
-            // Cambio de color automático al pasar de 2500 calorías
             let calColor = dailyCalories >= targetCalories ? "#00ffff" : "var(--nutrition-color)";
 
             ctx.beginPath();
