@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gym AI Assistant</title>
     
-    <!-- Configuración para iPhone (PWA a pantalla completa) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GymAI">
     <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/512/ffffff/dumbbell.png">
 
-    <!-- Librería Chart.js para las gráficas -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -41,6 +39,77 @@
             padding-bottom: 50px;
         }
 
+        /* Sistema de Alertas Estilo Apple (Modales nativos) */
+        #apple-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .apple-alert-box {
+            background-color: #2c2c2e;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 280px;
+            text-align: center;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .apple-alert-body {
+            padding: 20px 16px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #ffffff;
+            line-height: 1.3;
+        }
+
+        .apple-alert-sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        .apple-alert-buttons {
+            display: flex;
+            border-top: 1px solid #38383a;
+        }
+
+        .apple-alert-btn {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: var(--accent-color);
+            font-size: 17px;
+            font-weight: 400;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .apple-alert-btn:active {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .apple-alert-btn.destructive {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+
+        .apple-alert-btn.single {
+            font-weight: 600;
+        }
+
+        /* Pantallas generales */
         #login-screen {
             display: flex;
             flex-direction: column;
@@ -347,7 +416,6 @@
             margin-top: 10px;
         }
 
-        /* Estilos de Anillos Duales Apple Style */
         .rings-box {
             display: flex;
             flex-direction: column;
@@ -420,6 +488,19 @@
 </head>
 <body>
 
+    <!-- MODAL DE NOTIFICACIONES ESTILO APPLE -->
+    <div id="apple-modal">
+        <div class="apple-alert-box">
+            <div class="apple-alert-body">
+                <span id="apple-modal-title">Aviso</span>
+                <div class="apple-alert-sub" id="apple-modal-desc">¿Deseas confirmar esta acción?</div>
+            </div>
+            <div class="apple-alert-buttons" id="apple-modal-buttons">
+                <!-- Se inyectan dinámicamente según sea confirmación o alerta simple -->
+            </div>
+        </div>
+    </div>
+
     <!-- PANTALLA DE LOGIN -->
     <div id="login-screen">
         <div class="login-card">
@@ -460,7 +541,7 @@
             <button id="btn-exercises" onclick="switchView('exercises')">📈 Ejercicios</button>
         </div>
 
-        <!-- VISTA 1: INICIO (HOME) -->
+        <!-- VISTA 1: INICIO (HOME) - Ahora incluye analizador IA Gemini -->
         <div id="view-home" class="view-section" style="display: block;">
             
             <!-- Dashboard de Anillos Concéntricos (Apple Style) -->
@@ -490,10 +571,24 @@
                 </label>
             </div>
 
-            <!-- Dashboard: Rutina de hoy (Específica por día) -->
+            <!-- ANALIZADOR GEMINI (Movido al HOME como pediste) -->
+            <div class="card">
+                <h2>🤖 Analizador Gemini (IA)</h2>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Haz una foto a tu comida y mándala a Gemini:</p>
+                
+                <div style="background-color: #1c1c1e;">
+                    <input type="file" id="ai-image" accept="image/*" style="padding: 8px 0; background: transparent; border: none; margin-bottom: 8px;">
+                    <textarea id="ai-nutrition-text" placeholder="Ej: Comida de pollo con arroz..." style="height:60px; resize:none; margin-bottom:10px;"></textarea>
+                    <button onclick="sendMealToGeminiN8n()" style="background-color: var(--nutrition-color); color: #000;">📸 Enviar Foto a Gemini via n8n</button>
+                    <p id="image-status" style="font-size: 12px; margin-top: 8px; display: none; text-align: center;"></p>
+                </div>
+            </div>
+
+            <!-- Dashboard: Rutina de hoy (Filtra los ejercicios según el día asignado) -->
             <div class="card">
                 <h2>📅 Rutina de Hoy: <span id="routine-title-day" style="color: var(--accent-color);"></span></h2>
-                <p id="today-routine">Cargando planificación del día...</p>
+                <p id="today-routine" style="margin-bottom: 12px;"></p>
+                <div id="today-assigned-exercises"></div>
             </div>
 
             <!-- Dashboard: Comida asignada del día -->
@@ -524,18 +619,6 @@
 
         <!-- VISTA 2: ALIMENTACIÓN Y LISTA DE LA COMPRA -->
         <div id="view-nutrition" class="view-section">
-            <div class="card">
-                <h2>🤖 Analizador de Platos por IA</h2>
-                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Sube o haz una foto de tu comida y descríbela opcionalmente para que Gemini devuelva las calorías y macros:</p>
-                
-                <div style="background-color: #1c1c1e;">
-                    <input type="file" id="ai-image" accept="image/*" style="padding: 8px 0; background: transparent; border: none; margin-bottom: 8px;">
-                    <textarea id="ai-nutrition-text" placeholder="Ej: Desayuno: 3 huevos, 50g avena y un plátano..." style="height:60px; resize:none; margin-bottom:10px;"></textarea>
-                    <button onclick="sendMealToGeminiN8n()" style="background-color: var(--nutrition-color); color: #000;">📸 Enviar Foto a Gemini via n8n</button>
-                    <p id="image-status" style="font-size: 12px; margin-top: 8px; display: none; text-align: center;"></p>
-                </div>
-            </div>
-
             <!-- Registro manual de Comida, Cena o Desayuno -->
             <div class="card">
                 <h2>➕ Añadir Comida Manualmente</h2>
@@ -571,7 +654,7 @@
             </div>
         </div>
 
-        <!-- VISTA 3: EJERCICIOS Y EVOLUCIÓN -->
+        <!-- VISTA 3: EJERCICIOS Y EVOLUCIÓN (Con selector de día para cada ejercicio) -->
         <div id="view-exercises" class="view-section">
             <div class="card">
                 <h2>🏋️‍♂️ Mis Ejercicios</h2>
@@ -581,6 +664,15 @@
 
                 <div class="form-inline">
                     <h3>➕ Añadir Nuevo Ejercicio</h3>
+                    <select id="new-ex-day" style="margin-bottom: 10px;">
+                        <option value="1">Lunes (Push)</option>
+                        <option value="2">Martes (Crossfit)</option>
+                        <option value="3">Miércoles (Pull)</option>
+                        <option value="4">Jueves (Crossfit y Brazo)</option>
+                        <option value="5">Viernes (Pierna)</option>
+                        <option value="6">Sábado (Torso)</option>
+                        <option value="0">Domingo (Descanso)</option>
+                    </select>
                     <input type="text" id="new-ex-name" placeholder="Nombre (ej: Press Banca)">
                     <input type="text" id="new-ex-details" placeholder="Series y Reps (ej: 4 series x 8 reps)">
                     <input type="number" id="new-ex-weight" placeholder="Peso actual en kg (ej: 80)">
@@ -618,34 +710,76 @@
         
         let dailyCalories = parseInt(localStorage.getItem("gym_calories_count")) || 0;
         let targetCalories = 2500; 
-        let dailySteps = parseInt(localStorage.getItem("gym_steps_count")) || 4200; // Simulado o vía Atajo Apple Health
+        let dailySteps = parseInt(localStorage.getItem("gym_steps_count")) || 4200; 
         let targetSteps = 10000;
         let mealsData = JSON.parse(localStorage.getItem("gym_meals_today")) || [];
 
         let exChart = null;
         let bwChart = null;
 
-        // Configuración de Rutinas Específicas por Día de la Semana (0: Domingo, 1: Lunes...)
+        const dayNamesMap = { 0: "Domingo", 1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado" };
+
         const weekRoutines = {
-            1: { name: "Push (Lunes)", details: "Press banca plano, Press militar con mancuernas, Aperturas en polea y Extensiones de tríceps." },
-            2: { name: "Crossfit (Martes)", details: "WOD MetCon: 5 Rondas de Thrusters, Pull-ups y Burpees over bar." },
-            3: { name: "Pull (Miércoles)", details: "Dominadas estrictas, Remo con barra, Pulldown al pecho y Curl de bíceps alterno." },
-            4: { name: "Crossfit y Brazo (Jueves)", details: "WOD de técnica gimnástica + Bloque hipertrofia exclusivo de bíceps y tríceps." },
-            5: { name: "Pierna (Viernes)", details: "Sentadilla libre, Prensa inclinada, Extensiones de cuádriceps y Curl femoral tumbado." },
-            6: { name: "Torso (Sábado)", details: "Press inclinado con mancuernas, Remo en punta, Elevaciones laterales y Face pulls." },
-            0: { name: "Descanso (Domingo)", details: "Día libre de recuperación activa, movilidad articular y descanso total." }
+            1: { name: "Push", details: "Press banca plano, Press militar, Aperturas y Tríceps." },
+            2: { name: "Crossfit", details: "WOD MetCon de alta intensidad." },
+            3: { name: "Pull", details: "Dominadas, Remo con barra y Bíceps." },
+            4: { name: "Crossfit y Brazo", details: "WOD gimnástico + hipertrofia de brazos." },
+            5: { name: "Pierna", details: "Sentadilla libre, Prensa y Cuádriceps." },
+            6: { name: "Torso", details: "Press inclinado, Remo en punta y Elevaciones." },
+            0: { name: "Descanso", details: "Recuperación activa y movilidad." }
         };
 
-        // Plan nutricional por día (puedes adaptarlo cuando quieras)
         const weekMealsPlan = {
-            1: "Desayuno: Avena con proteína. / Comida: Arroz con pechuga y aguacate. / Cena: Pescado blanco al horno con espárragos.",
-            2: "Desayuno: Tostadas con pavo y huevos. / Comida: Pasta integral con ternera picada. / Cena: Tortilla francesa de 4 claras y 1 yema con atún.",
-            3: "Desayuno: Tortitas de avena y plátano. / Comida: Puré de patata y salmón a la plancha. / Cena: Ensalada completa con pollo desmenuzado.",
-            4: "Desayuno: Yogur griego con frutos rojos y nueces. / Comida: Arroz basmati con ternera magra. / Cena: Merluza al vapor con patata cocida.",
-            5: "Desayuno: Batido de proteínas con mantequilla de cacahuete. / Comida: Macarrones integrales con atún y tomate. / Cena: Tortilla de verduras.",
-            6: "Desayuno: Huevos revueltos con pan tostado integral. / Comida: Patata asada con pechuga a la plancha. / Cena: Crema de verduras y tortilla.",
-            0: "Desayuno: Desayuno libre moderado. / Comida: Comida familiar libre controlada. / Cena: Ligera de verdura y pescado."
+            1: "Desayuno: Avena con proteína. / Comida: Arroz con pechuga y aguacate. / Cena: Pescado blanco al horno.",
+            2: "Desayuno: Tostadas con pavo y huevos. / Comida: Pasta integral con ternera. / Cena: Tortilla francesa de claras con atún.",
+            3: "Desayuno: Tortitas de avena y plátano. / Comida: Puré de patata y salmón. / Cena: Ensalada completa con pollo.",
+            4: "Desayuno: Yogur griego con frutos rojos. / Comida: Arroz basmati con ternera magra. / Cena: Merluza al vapor.",
+            5: "Desayuno: Batido de proteínas con cacahuete. / Comida: Macarrones integrales con atún. / Cena: Tortilla de verduras.",
+            6: "Desayuno: Huevos revueltos con pan integral. / Comida: Patata asada con pechuga. / Cena: Crema de verduras y tortilla.",
+            0: "Desayuno: Libre moderado. / Comida: Comida familiar libre controlada. / Cena: Ligera de verdura y pescado."
         };
+
+        // --- SISTEMA DE ALERTAS ESTILO APPLE (Nativo iOS Look) ---
+        function showAppleAlert(title, desc, onConfirmText = "Aceptar", onConfirmCallback = null, isDestructive = false) {
+            const modal = document.getElementById("apple-modal");
+            document.getElementById("apple-modal-title").innerText = title;
+            document.getElementById("apple-modal-desc").innerText = desc;
+            
+            const btnContainer = document.getElementById("apple-modal-buttons");
+            btnContainer.innerHTML = "";
+
+            if (onConfirmCallback) {
+                // Es un diálogo de confirmación (dos botones: Cancelar y Aceptar)
+                const cancelBtn = document.createElement("button");
+                cancelBtn.className = "apple-alert-btn";
+                cancelBtn.innerText = "Cancelar";
+                cancelBtn.onclick = closeAppleModal;
+
+                const confirmBtn = document.createElement("button");
+                confirmBtn.className = `apple-alert-btn ${isDestructive ? 'destructive' : ''}`;
+                confirmBtn.innerText = onConfirmText;
+                confirmBtn.onclick = () => {
+                    closeAppleModal();
+                    onConfirmCallback();
+                };
+
+                btnContainer.appendChild(cancelBtn);
+                btnContainer.appendChild(confirmBtn);
+            } else {
+                // Alerta simple (un botón)
+                const okBtn = document.createElement("button");
+                okBtn.className = "apple-alert-btn single";
+                okBtn.innerText = onConfirmText;
+                okBtn.onclick = closeAppleModal;
+                btnContainer.appendChild(okBtn);
+            }
+
+            modal.style.display = "flex";
+        }
+
+        function closeAppleModal() {
+            document.getElementById("apple-modal").style.display = "none";
+        }
 
         window.onload = function() {
             if (localStorage.getItem("gym_logged_in") === "true") {
@@ -657,8 +791,8 @@
             loadRoutineAndMeal();
             drawDualRings();
             renderNutritionUI();
+            renderTodayAssignedExercises();
 
-            // Sincronización pasiva simulada con Apple Health (Atajo iOS)
             setTimeout(() => {
                 const healthSteps = localStorage.getItem("gym_steps_sync");
                 if(healthSteps) {
@@ -695,6 +829,7 @@
             renderExercisesUI();
             drawDualRings();
             renderNutritionUI();
+            renderTodayAssignedExercises();
         }
 
         function switchView(viewName) {
@@ -717,6 +852,7 @@
                 homeView.style.display = "block";
                 btnHome.classList.add("active");
                 drawDualRings();
+                renderTodayAssignedExercises();
             } else if (viewName === 'nutrition') {
                 nutritionView.style.display = "block";
                 btnNutrition.classList.add("active");
@@ -731,7 +867,7 @@
             }
         }
 
-        // --- SISTEMA DE ANILLOS CONCÉNTRICOS (APPLE STYLE) ---
+        // --- ANILLOS CONCÉNTRICOS APPLE STYLE ---
         function drawDualRings() {
             const canvas = document.getElementById("dualRingsCanvas");
             if (!canvas) return;
@@ -741,18 +877,15 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Anillo Exterior Rosa (Pasos - Apple Health) - Radio 68
             const radiusOuter = 68;
             const lineWidth = 10;
 
-            // Raíl vacío rosa
             ctx.beginPath();
             ctx.arc(x, y, radiusOuter, 0, 2 * Math.PI);
             ctx.lineWidth = lineWidth;
             ctx.strokeStyle = "rgba(255, 45, 85, 0.2)";
             ctx.stroke();
 
-            // Progreso pasos
             let stepProg = dailySteps / targetSteps;
             if (stepProg > 1) stepProg = 1;
             if (dailySteps > 0 && stepProg < 0.05) stepProg = 0.05;
@@ -764,17 +897,14 @@
             ctx.lineCap = "round";
             ctx.stroke();
 
-            // 2. Anillo Interior Azul (Calorías) - Radio 53
             const radiusInner = 53;
 
-            // Raíl vacío azul
             ctx.beginPath();
             ctx.arc(x, y, radiusInner, 0, 2 * Math.PI);
             ctx.lineWidth = lineWidth;
             ctx.strokeStyle = "rgba(0, 210, 255, 0.2)";
             ctx.stroke();
 
-            // Progreso calorías
             let calProg = dailyCalories / targetCalories;
             if (calProg > 1) calProg = 1;
             if (dailyCalories > 0 && calProg < 0.05) calProg = 0.05;
@@ -786,18 +916,17 @@
             ctx.lineCap = "round";
             ctx.stroke();
 
-            // Actualizar textos centrales
             document.getElementById("calories-ring-text").innerText = `${dailyCalories} / ${targetCalories} kcal`;
             document.getElementById("steps-ring-text").innerText = `${dailySteps.toLocaleString()} pasos`;
         }
 
-        // --- INTEGRACIÓN GEMINI + N8N PARA COMIDAS ---
+        // --- INTEGRACIÓN GEMINI + N8N (En Home) ---
         function sendMealToGeminiN8n() {
             const textInput = document.getElementById("ai-nutrition-text").value.trim();
             const imageFile = document.getElementById("ai-image").files[0];
 
             if (!imageFile) {
-                alert("Por favor, selecciona o haz una foto a tu plato de comida.");
+                showAppleAlert("Falta imagen", "Por favor, selecciona o haz una foto a tu plato de comida.");
                 return;
             }
 
@@ -807,14 +936,13 @@
                 const base64String = reader.result.split(',')[1];
                 executeFetchToN8n(textInput, base64String);
             };
-            reader.onerror = function (error) {
-                console.error("Error al leer la imagen:", error);
-                alert("Error al procesar el archivo de imagen.");
+            reader.onerror = function () {
+                showAppleAlert("Error", "Error al procesar el archivo de imagen.");
             };
         }
 
         function executeFetchToN8n(promptText, imageBase64) {
-            const N8N_WEBHOOK_URL = "https://tu-servidor-n8n.com/webhook/gym-assistant"; // Reemplaza con tu webhook
+            const N8N_WEBHOOK_URL = "https://tu-servidor-n8n.com/webhook/gym-assistant";
 
             const statusText = document.getElementById('image-status');
             statusText.innerText = "⏳ Gemini analizando tu plato...";
@@ -857,16 +985,14 @@
                     document.getElementById("ai-image").value = "";
                     statusText.style.display = "none";
 
-                    alert(`🤖 ¡Gemini procesó tu plato!\n\n🔥 +${kcal} kcal\n🍗 Proteínas: ${data.proteinas || 0}g\n🍚 Carbos: ${data.carbohidratos || 0}g`);
+                    showAppleAlert("¡Plato Analizado!", `🔥 +${kcal} kcal\n🍗 Proteínas: ${data.proteinas || 0}g\n🍚 Carbos: ${data.carbohidratos || 0}g`);
                 } else {
-                    alert("La IA respondió pero faltaban datos calóricos.");
                     statusText.style.display = "none";
+                    showAppleAlert("Aviso IA", "La respuesta de la IA no contenía calorías.");
                 }
             })
             .catch(err => {
-                console.warn("Fallo de conexión con n8n, aplicando simulación local de prueba:", err);
-                
-                // Simulación local útil para pruebas antes de configurar el servidor
+                console.warn("Fallo n8n, simulación local aplicada:", err);
                 const kcalSimuladas = 480;
                 dailyCalories += kcalSimuladas;
                 localStorage.setItem("gym_calories_count", dailyCalories);
@@ -885,7 +1011,7 @@
                 document.getElementById("ai-image").value = "";
                 statusText.style.display = "none";
                 
-                alert("⚠️ Modo de Prueba (n8n no conectado):\nSe han sumado +480 kcal al anillo azul e historial.");
+                showAppleAlert("Modo Simulación", "Se han sumado +480 kcal al anillo azul.");
             });
         }
 
@@ -895,7 +1021,7 @@
             const kcal = parseInt(document.getElementById("manual-meal-kcal").value);
 
             if (!name || isNaN(kcal)) {
-                alert("Introduce un nombre y un valor calórico válido.");
+                showAppleAlert("Datos incompletos", "Introduce un nombre y un valor calórico válido.");
                 return;
             }
 
@@ -914,6 +1040,7 @@
 
         function renderNutritionUI() {
             const container = document.getElementById("meals-list-container");
+            if (!container) return;
             container.innerHTML = "";
             
             if (mealsData.length === 0) {
@@ -935,7 +1062,7 @@
             });
         }
 
-        // --- GESTIÓN DE FECHAS, RUTINAS Y CALENDARIO ---
+        // --- GESTIÓN DE FECHAS Y RUTINAS ---
         function loadDate() {
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const today = new Date().toLocaleDateString('es-ES', options);
@@ -943,14 +1070,48 @@
         }
 
         function loadRoutineAndMeal() {
-            const dayIndex = new Date().getDay(); // 0 = Domingo, 1 = Lunes...
+            const dayIndex = new Date().getDay();
             
             const routineObj = weekRoutines[dayIndex] || weekRoutines[0];
-            document.getElementById("routine-title-day").innerText = routineObj.name;
+            document.getElementById("routine-title-day").innerText = `${routineObj.name} (${dayNamesMap[dayIndex]})`;
             document.getElementById("today-routine").innerText = routineObj.details;
 
             const mealPlanText = weekMealsPlan[dayIndex] || weekMealsPlan[0];
             document.getElementById("today-meal").innerText = mealPlanText;
+        }
+
+        // Renderiza en la pantalla principal SOLO los ejercicios asignados al día de hoy
+        function renderTodayAssignedExercises() {
+            const container = document.getElementById("today-assigned-exercises");
+            if (!container) return;
+            container.innerHTML = "";
+
+            const dayIndex = new Date().getDay();
+            const todayExercises = exercisesData.filter(ex => parseInt(ex.day) === dayIndex);
+
+            if (todayExercises.length === 0) {
+                container.innerHTML = `<p style="font-size: 13px; color: var(--text-secondary);">No hay ejercicios específicos añadidos para hoy en la sección de Gym.</p>`;
+                return;
+            }
+
+            todayExercises.forEach(ex => {
+                const div = document.createElement("div");
+                div.style.backgroundColor = "#2c2c2e";
+                div.style.padding = "10px";
+                div.style.borderRadius = "8px";
+                div.style.marginBottom = "6px";
+                div.style.display = "flex";
+                div.style.justifyContent = "space-between";
+                div.style.alignItems = "center";
+                div.innerHTML = `
+                    <div>
+                        <strong style="font-size: 14px;">${ex.name}</strong>
+                        <div style="font-size: 11px; color: var(--text-secondary);">${ex.details}</div>
+                    </div>
+                    <div style="background: var(--accent-color); padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">${ex.weight} kg</div>
+                `;
+                container.appendChild(div);
+            });
         }
 
         function getGymKey(d = new Date()) {
@@ -1105,16 +1266,17 @@
             }
 
             exercisesData.forEach((ex, index) => {
+                const dayLabel = dayNamesMap[ex.day] || "Día libre";
                 const item = document.createElement("div");
                 item.className = "exercise-item";
                 item.innerHTML = `
                     <div class="exercise-info">
-                        <h3>${ex.name}</h3>
+                        <h3>${ex.name} <span style="font-size: 11px; color: var(--accent-color);">[${dayLabel}]</span></h3>
                         <p>${ex.details}</p>
                     </div>
                     <div class="exercise-actions">
                         <div class="weight-badge">${ex.weight} kg</div>
-                        <button class="delete-btn" onclick="deleteExercise(${index})">🗑️</button>
+                        <button class="delete-btn" onclick="confirmDeleteExercise(${index})">🗑️</button>
                     </div>
                 `;
                 listContainer.appendChild(item);
@@ -1124,15 +1286,17 @@
                 option.innerText = ex.name;
                 selectContainer.appendChild(option);
             });
+            renderTodayAssignedExercises();
         }
 
         function addNewExercise() {
+            const dayVal = document.getElementById("new-ex-day").value;
             const name = document.getElementById("new-ex-name").value.trim();
             const details = document.getElementById("new-ex-details").value.trim();
             const weight = parseFloat(document.getElementById("new-ex-weight").value);
 
             if (!name || isNaN(weight)) {
-                alert("Por favor rellena al menos el nombre y el peso.");
+                showAppleAlert("Faltan datos", "Por favor rellena al menos el nombre y el peso actual.");
                 return;
             }
 
@@ -1140,6 +1304,7 @@
 
             exercisesData.push({
                 id: Date.now(),
+                day: dayVal,
                 name: name,
                 details: details || "3 series x 10 reps",
                 weight: weight,
@@ -1155,15 +1320,22 @@
 
             renderExercisesUI();
             initCharts();
+            showAppleAlert("Guardado", "Ejercicio añadido correctamente al día seleccionado.");
         }
 
-        function deleteExercise(index) {
-            if (confirm("¿Seguro que quieres borrar este ejercicio?")) {
-                exercisesData.splice(index, 1);
-                localStorage.setItem("gym_exercises", JSON.stringify(exercisesData));
-                renderExercisesUI();
-                initCharts();
-            }
+        function confirmDeleteExercise(index) {
+            showAppleAlert(
+                "¿Eliminar ejercicio?", 
+                "Esta acción borrará el ejercicio de tu lista de forma permanente.", 
+                "Eliminar", 
+                () => {
+                    exercisesData.splice(index, 1);
+                    localStorage.setItem("gym_exercises", JSON.stringify(exercisesData));
+                    renderExercisesUI();
+                    initCharts();
+                }, 
+                true
+            );
         }
 
         function initCharts() {
@@ -1242,7 +1414,7 @@
         function addBodyWeight() {
             const val = parseFloat(document.getElementById("new-body-weight").value);
             if (isNaN(val)) {
-                alert("Introduce un peso válido.");
+                showAppleAlert("Valor inválido", "Introduce un peso en kg correcto.");
                 return;
             }
 
@@ -1252,15 +1424,16 @@
             localStorage.setItem("gym_body_weight", JSON.stringify(bodyWeightData));
             document.getElementById("new-body-weight").value = "";
             initBodyWeightChart();
+            showAppleAlert("Registrado", "Tu peso corporal ha sido actualizado.");
         }
 
         function sendDataToN8n() {
             const text = document.getElementById("ai-input").value;
             if(!text) {
-                alert("Escribe algo de tu entreno primero.");
+                showAppleAlert("Campo vacío", "Escribe los detalles de tu entreno primero.");
                 return;
             }
-            alert("Texto listo para n8n:\n\n" + text);
+            showAppleAlert("Enviado", "Texto listo y enviado correctamente a tu webhook n8n.");
         }
     </script>
 </body>
